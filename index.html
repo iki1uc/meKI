@@ -2,18 +2,21 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>iki · Raumkrümmung · Continuum</title>
+<title>meKI · Continuum · OPTA · Kernel‑RESPO</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+
+<link rel="stylesheet" href="core/core_hud.css">
 
 <style>
   body {
     background:#000;
     color:#7dd3fc;
-    font-family:system-ui;
+    font-family:monospace;
     margin:0;
     padding:0;
   }
 
+  /* CONTINUUM */
   #continuum {
     position:fixed;
     top:0; left:0; right:0; bottom:0;
@@ -23,13 +26,13 @@
     background:radial-gradient(circle at center, #0b1220, #000);
     transition:all .6s ease;
   }
-
   #continuum.krumm {
     transform:perspective(600px) rotateX(var(--krummX)) rotateY(var(--krummY));
     filter:blur(var(--blur));
   }
 
-  #controls {
+  /* ROMANCE BAR */
+  #iki-romance {
     position:fixed;
     bottom:0;
     left:0; right:0;
@@ -40,9 +43,9 @@
     gap:10px;
     justify-content:center;
     flex-wrap:wrap;
+    z-index:99999;
   }
-
-  .btn {
+  .iki-rom-btn {
     background:#0b1220;
     color:#7dd3fc;
     border:1px solid #1f2937;
@@ -52,31 +55,68 @@
     border-radius:6px;
     transition:.2s;
   }
-  .btn:hover {
+  .iki-rom-btn:hover {
     background:#12263a;
+    color:#a8e8ff;
     transform:scale(1.05);
   }
+
+  /* PANEL */
+  #panel {
+    width:760px;
+    margin:0 auto;
+    margin-top:40px;
+    background:#000;
+    padding:20px;
+    color:#aaffcc;
+  }
+  pre { font-size:13px; line-height:1.2; }
 </style>
 </head>
 
 <body>
 
 <div id="continuum">
-  <h1>Continuum‑Raumkrümmung aktiv</h1>
+  <h1>meKI · Continuum‑Raumkrümmung aktiv</h1>
 </div>
 
-<div id="controls">
-  <button class="btn" onclick="krumm(-20,0, '2px')">H‑Achse · Krümmung</button>
-  <button class="btn" onclick="krumm(0,-20, '3px')">B‑Achse · Krümmung</button>
-  <button class="btn" onclick="krumm(20,20, '4px')">T‑Achse · Krümmung</button>
+<!-- PANEL (A/B/C) -->
+<div id="panel">
+  <div style="text-align:center;color:#66ffaa;font-size:18px;margin-bottom:12px;">
+    4‑Respo‑Panel – ALT + NEU + ERKENNTNIS
+  </div>
 
-  <button class="btn" onclick="zeit('V')">Vergangenheit</button>
-  <button class="btn" onclick="zeit('J')">Jetzt</button>
-  <button class="btn" onclick="zeit('Z')">Zukunft</button>
+  <div style="margin-bottom:20px;">
+    <div style="color:#55ff99;margin-bottom:4px;">iki1uc – leichtfüßigster Move</div>
+    <pre id="iki1uc"></pre>
+  </div>
 
-  <button class="btn" onclick="resetKrumm()">Reset</button>
+  <div style="margin-bottom:20px;">
+    <div style="color:#66aaff;margin-bottom:4px;">iki7uc – ALT+NEU Teleport</div>
+    <pre id="iki7uc"></pre>
+  </div>
+
+  <div style="margin-bottom:20px;">
+    <div style="color:#ffaa66;margin-bottom:4px;">iki2li – Operator‑Field</div>
+    <pre id="iki2li"></pre>
+  </div>
+
+  <div style="margin-bottom:20px;">
+    <div style="color:#ff66aa;margin-bottom:4px;">OP – EVO‑Burst</div>
+    <pre id="op"></pre>
+  </div>
 </div>
 
+<!-- ROMANCE BAR -->
+<div id="iki-romance"></div>
+
+<!-- MODULES -->
+<script type="module" src="SETI.js"></script>
+<script type="module" src="SET.js"></script>
+<script type="module" src="cube.js"></script>
+<script type="module" src="ernte.js"></script>
+
+<!-- CONTINUUM LOGIC -->
 <script>
 function krumm(x, y, blur){
   const c = document.getElementById("continuum");
@@ -85,18 +125,122 @@ function krumm(x, y, blur){
   c.style.setProperty("--krummY", y+"deg");
   c.style.setProperty("--blur", blur);
 }
-
 function resetKrumm(){
   const c = document.getElementById("continuum");
   c.classList.remove("krumm");
 }
+</script>
 
-function zeit(axis){
-  const c = document.getElementById("continuum");
-  if(axis === "V") c.style.background = "radial-gradient(circle, #220000, #000)";
-  if(axis === "J") c.style.background = "radial-gradient(circle, #002222, #000)";
-  if(axis === "Z") c.style.background = "radial-gradient(circle, #000022, #000)";
-}
+<!-- ROMANCE BUTTONS (SETI.js) -->
+<script type="module">
+import { SWITCHES } from "./SETI.js";
+
+const box = document.getElementById("iki-romance");
+
+SWITCHES.forEach(sw => {
+    const btn = document.createElement("button");
+    btn.className = "iki-rom-btn";
+    btn.textContent = sw.name;
+
+    btn.onclick = () => {
+        const result = sw.run();
+        const msg = `${sw.name}\n\n${sw.desc}\n\nÜbernehmen?`;
+        if(result !== false){
+            if(confirm(msg)){
+                console.log("Übernommen:", sw.name);
+            } else {
+                console.log("Weiter suchen…");
+            }
+        } else {
+            console.log("Schalter konnte nicht greifen:", sw.name);
+        }
+    };
+
+    box.appendChild(btn);
+});
+</script>
+
+<!-- A/B/C MODULES -->
+<script>
+/* iki1uc */
+(function(){
+  const el = document.getElementById("iki1uc");
+  const G="■",U="▲",D="·",L="◄",R="►";
+  const FRAMES=[
+`      ${U}
+   ${L}   ${G}   ${R}
+      ${D}`,
+`      ${D}
+   ${L}   ${G}   ${R}
+      ${U}`,
+`      ${U}
+   ${L}   ${G}   ${R}
+      ${U}`,
+`      ${U}
+   ${L}   ${G}   ${R}
+      ${D}`
+  ];
+  let i=0;
+  setInterval(()=>{ el.textContent=FRAMES[i]; i=(i+1)%FRAMES.length; },600);
+})();
+
+/* iki7uc */
+(function(){
+  const el = document.getElementById("iki7uc");
+  const symbols=["A","B","C","D","1","2","3","4","■","□","▲","·"];
+  function frame(){
+    let out="",idx=Math.floor(Math.random()*symbols.length);
+    for(let r=0;r<3;r++){
+      let row="";
+      for(let c=0;c<4;c++){
+        idx=(idx+(Math.random()<0.5?1:2))%symbols.length;
+        const active=Math.random()<0.32;
+        row+=active?`[${symbols[idx]}]`:`[ ]`;
+      }
+      out+=row+"\n";
+    }
+    return out;
+  }
+  setInterval(()=>{ el.textContent=frame(); },160);
+})();
+
+/* iki2li */
+(function(){
+  const el = document.getElementById("iki2li");
+  const G="■",O="●";
+  const FRAMES=[
+`      ${O}
+   ◄   ${G}   ►
+      ${O}`,
+`      ${G}
+   ◄   ${O}   ►
+      ${G}`,
+`      ${O}
+   ◄   ${G}   ►
+      ${O}`
+  ];
+  let i=0;
+  setInterval(()=>{ el.textContent=FRAMES[i]; i=(i+1)%FRAMES.length; },900);
+})();
+
+/* OP */
+(function(){
+  const el = document.getElementById("op");
+  const G="■",U="▲";
+  const FRAMES=[
+`   ${U}   ${G}   ${U}
+       ${U}
+   ${U}   ${G}   ${U}`,
+`   ${G}   ${U}   ${G}
+       ${U}
+   ${G}   ${U}   ${G}`,
+`   ${U}   ${G}   ${U}
+       ${U}
+   ${U}   ${G}   ${U}`
+  ];
+  let i=0;
+  setInterval(()=>{ el.textContent=FRAMES[i]; i=(i+1)%FRAMES.length; },700);
+})();
 </script>
 
 </body>
