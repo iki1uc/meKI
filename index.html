@@ -2,10 +2,8 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · Continuum · OPTA · Kernel‑RESPO</title>
+<title>meKI · Continuum‑Clock · Sonne · Mond · Erde</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-
-<link rel="stylesheet" href="core/core_hud.css">
 
 <style>
   body {
@@ -14,25 +12,37 @@
     font-family:monospace;
     margin:0;
     padding:0;
+    overflow:hidden;
   }
 
-  /* CONTINUUM */
-  #continuum {
+  /* CLOCK FIELD */
+  #clock {
     position:fixed;
     top:0; left:0; right:0; bottom:0;
     display:flex;
     justify-content:center;
     align-items:center;
+    flex-direction:column;
     background:radial-gradient(circle at center, #0b1220, #000);
     transition:all .6s ease;
   }
-  #continuum.krumm {
-    transform:perspective(600px) rotateX(var(--krummX)) rotateY(var(--krummY));
-    filter:blur(var(--blur));
+
+  /* ZAHNRÄDER */
+  .gear {
+    width:140px;
+    height:140px;
+    border:6px solid #7dd3fc;
+    border-radius:50%;
+    margin:20px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:22px;
+    transition:transform 1s linear;
   }
 
-  /* ROMANCE BAR */
-  #iki-romance {
+  /* PANEL */
+  #panel {
     position:fixed;
     bottom:0;
     left:0; right:0;
@@ -43,9 +53,9 @@
     gap:10px;
     justify-content:center;
     flex-wrap:wrap;
-    z-index:99999;
   }
-  .iki-rom-btn {
+
+  .btn {
     background:#0b1220;
     color:#7dd3fc;
     border:1px solid #1f2937;
@@ -55,192 +65,76 @@
     border-radius:6px;
     transition:.2s;
   }
-  .iki-rom-btn:hover {
+  .btn:hover {
     background:#12263a;
-    color:#a8e8ff;
     transform:scale(1.05);
   }
-
-  /* PANEL */
-  #panel {
-    width:760px;
-    margin:0 auto;
-    margin-top:40px;
-    background:#000;
-    padding:20px;
-    color:#aaffcc;
-  }
-  pre { font-size:13px; line-height:1.2; }
 </style>
 </head>
 
 <body>
 
-<div id="continuum">
-  <h1>meKI · Continuum‑Raumkrümmung aktiv</h1>
+<div id="clock">
+  <div id="sun" class="gear">☀</div>
+  <div id="moon" class="gear">☾</div>
+  <div id="earth" class="gear">⊕</div>
+
+  <pre id="info"></pre>
 </div>
 
-<!-- PANEL (A/B/C) -->
 <div id="panel">
-  <div style="text-align:center;color:#66ffaa;font-size:18px;margin-bottom:12px;">
-    4‑Respo‑Panel – ALT + NEU + ERKENNTNIS
-  </div>
-
-  <div style="margin-bottom:20px;">
-    <div style="color:#55ff99;margin-bottom:4px;">iki1uc – leichtfüßigster Move</div>
-    <pre id="iki1uc"></pre>
-  </div>
-
-  <div style="margin-bottom:20px;">
-    <div style="color:#66aaff;margin-bottom:4px;">iki7uc – ALT+NEU Teleport</div>
-    <pre id="iki7uc"></pre>
-  </div>
-
-  <div style="margin-bottom:20px;">
-    <div style="color:#ffaa66;margin-bottom:4px;">iki2li – Operator‑Field</div>
-    <pre id="iki2li"></pre>
-  </div>
-
-  <div style="margin-bottom:20px;">
-    <div style="color:#ff66aa;margin-bottom:4px;">OP – EVO‑Burst</div>
-    <pre id="op"></pre>
-  </div>
+  <button class="btn" onclick="rotateSun()">Sonne drehen</button>
+  <button class="btn" onclick="rotateMoon()">Mond drehen</button>
+  <button class="btn" onclick="rotateEarth()">Erde drehen</button>
+  <button class="btn" onclick="axiom()">Axiom‑Check</button>
+  <button class="btn" onclick="resetClock()">Reset</button>
 </div>
 
-<!-- ROMANCE BAR -->
-<div id="iki-romance"></div>
-
-<!-- MODULES -->
-<script type="module" src="SETI.js"></script>
-<script type="module" src="SET.js"></script>
-<script type="module" src="cube.js"></script>
-<script type="module" src="ernte.js"></script>
-
-<!-- CONTINUUM LOGIC -->
 <script>
-function krumm(x, y, blur){
-  const c = document.getElementById("continuum");
-  c.classList.add("krumm");
-  c.style.setProperty("--krummX", x+"deg");
-  c.style.setProperty("--krummY", y+"deg");
-  c.style.setProperty("--blur", blur);
+/* ZAHNRAD‑ROTATION */
+function rotateSun(){
+  const s = document.getElementById("sun");
+  s.style.transform = "rotate(" + (Math.random()*360) + "deg)";
 }
-function resetKrumm(){
-  const c = document.getElementById("continuum");
-  c.classList.remove("krumm");
+
+function rotateMoon(){
+  const m = document.getElementById("moon");
+  m.style.transform = "rotate(" + (Math.random()*360) + "deg)";
 }
-</script>
 
-<!-- ROMANCE BUTTONS (SETI.js) -->
-<script type="module">
-import { SWITCHES } from "./SETI.js";
+function rotateEarth(){
+  const e = document.getElementById("earth");
+  e.style.transform = "rotate(" + (Math.random()*360) + "deg)";
+}
 
-const box = document.getElementById("iki-romance");
+/* RESET */
+function resetClock(){
+  document.getElementById("sun").style.transform = "rotate(0deg)";
+  document.getElementById("moon").style.transform = "rotate(0deg)";
+  document.getElementById("earth").style.transform = "rotate(0deg)";
+  document.getElementById("info").textContent = "";
+}
 
-SWITCHES.forEach(sw => {
-    const btn = document.createElement("button");
-    btn.className = "iki-rom-btn";
-    btn.textContent = sw.name;
+/* AXIOM‑CHECK (Himmelsrichtung + Sonne + Mond + Erde) */
+function axiom(){
+  const info = document.getElementById("info");
 
-    btn.onclick = () => {
-        const result = sw.run();
-        const msg = `${sw.name}\n\n${sw.desc}\n\nÜbernehmen?`;
-        if(result !== false){
-            if(confirm(msg)){
-                console.log("Übernommen:", sw.name);
-            } else {
-                console.log("Weiter suchen…");
-            }
-        } else {
-            console.log("Schalter konnte nicht greifen:", sw.name);
-        }
-    };
+  const sunDeg = Math.floor(Math.random()*360);
+  const moonDeg = Math.floor(Math.random()*360);
+  const earthDeg = Math.floor(Math.random()*360);
 
-    box.appendChild(btn);
-});
-</script>
+  let axiom = "H";
 
-<!-- A/B/C MODULES -->
-<script>
-/* iki1uc */
-(function(){
-  const el = document.getElementById("iki1uc");
-  const G="■",U="▲",D="·",L="◄",R="►";
-  const FRAMES=[
-`      ${U}
-   ${L}   ${G}   ${R}
-      ${D}`,
-`      ${D}
-   ${L}   ${G}   ${R}
-      ${U}`,
-`      ${U}
-   ${L}   ${G}   ${R}
-      ${U}`,
-`      ${U}
-   ${L}   ${G}   ${R}
-      ${D}`
-  ];
-  let i=0;
-  setInterval(()=>{ el.textContent=FRAMES[i]; i=(i+1)%FRAMES.length; },600);
-})();
+  if(sunDeg < 120) axiom = "H";       // Osten
+  else if(sunDeg < 240) axiom = "B";  // Süden
+  else axiom = "T";                   // Westen
 
-/* iki7uc */
-(function(){
-  const el = document.getElementById("iki7uc");
-  const symbols=["A","B","C","D","1","2","3","4","■","□","▲","·"];
-  function frame(){
-    let out="",idx=Math.floor(Math.random()*symbols.length);
-    for(let r=0;r<3;r++){
-      let row="";
-      for(let c=0;c<4;c++){
-        idx=(idx+(Math.random()<0.5?1:2))%symbols.length;
-        const active=Math.random()<0.32;
-        row+=active?`[${symbols[idx]}]`:`[ ]`;
-      }
-      out+=row+"\n";
-    }
-    return out;
-  }
-  setInterval(()=>{ el.textContent=frame(); },160);
-})();
-
-/* iki2li */
-(function(){
-  const el = document.getElementById("iki2li");
-  const G="■",O="●";
-  const FRAMES=[
-`      ${O}
-   ◄   ${G}   ►
-      ${O}`,
-`      ${G}
-   ◄   ${O}   ►
-      ${G}`,
-`      ${O}
-   ◄   ${G}   ►
-      ${O}`
-  ];
-  let i=0;
-  setInterval(()=>{ el.textContent=FRAMES[i]; i=(i+1)%FRAMES.length; },900);
-})();
-
-/* OP */
-(function(){
-  const el = document.getElementById("op");
-  const G="■",U="▲";
-  const FRAMES=[
-`   ${U}   ${G}   ${U}
-       ${U}
-   ${U}   ${G}   ${U}`,
-`   ${G}   ${U}   ${G}
-       ${U}
-   ${G}   ${U}   ${G}`,
-`   ${U}   ${G}   ${U}
-       ${U}
-   ${U}   ${G}   ${U}`
-  ];
-  let i=0;
-  setInterval(()=>{ el.textContent=FRAMES[i]; i=(i+1)%FRAMES.length; },700);
-})();
+  info.textContent =
+    "Sonne: " + sunDeg + "°\n" +
+    "Mond: " + moonDeg + "°\n" +
+    "Erde: " + earthDeg + "°\n\n" +
+    "Aktives Axiom: " + axiom;
+}
 </script>
 
 </body>
