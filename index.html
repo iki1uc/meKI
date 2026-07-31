@@ -3,6 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <title>ANKER – S01 · iki1uc</title>
+function testOrbit(cibik, hbt, link) {
+    console.log("=== ORBIT TEST START ===");
+
+    hbt.setAxis("H");
+    link.sync(); // IX
+    hbt.setAxis("B");
+    link.sync(); // XI
+    hbt.setAxis("T");
+    link.sync(); // X4
+
+    cibik.orbitAll(); // IX + XI + X4
+
+    console.log("=== ORBIT TEST END ===");
+}
 
 <style>
 body { background:#000; color:#0f0; font-family:monospace; padding:40px; }
@@ -113,6 +127,16 @@ a { color:#6cf; text-decoration:none; font-weight:bold; }
     --------------------------------*/
     const tem = TEM_CORE();
     const run8 = RUN8();
+function validateCSV(layer) {
+    return layer.length > 0 && layer[0].length >= 2;
+}
+
+console.log("Layer 1 OK:", validateCSV(cibik.layer1));
+console.log("Layer 2 OK:", validateCSV(cibik.layer2));
+console.log("Layer 3 OK:", validateCSV(layer3));
+<script src="ernte.js"></script>      <!-- 4 -->
+<script src="cube.js"></script>       <!-- 0 + 1 -->
+<script src="id.html"></script>       <!-- 2 -->
 
     document.getElementById("system-status").innerText =
         `Zeit: ${tem.timestamp}\nKernel: ${run8.run}\nSystem: OK`;
