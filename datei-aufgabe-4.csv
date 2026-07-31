@@ -1,0 +1,5 @@
+﻿Datei,Aufgabe,Warum wichtig
+modus‑bewegung‑3.csv,Bewegungs‑Matrix (H/B/T),Aktiviert lineare & kontinuierliche Axiom‑Bewegung
+ernte.js,Kernel‑RESPO,"Stabilisiert Dreiecke, 9×9, 81‑Felder"
+id.html,UI‑Panel,"Schaltet Modi, Orbit, UPG"
+index.html,Startpunkt,Lädt alle Module
