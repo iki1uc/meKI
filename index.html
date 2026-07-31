@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · 756 Continuum Grid</title>
+<title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -14,10 +14,10 @@
     overflow:hidden;
   }
 
-  /* 756 GRID: 729 Achsenpunkte + 27 Kontrollpunkte */
+  /* GRID 756 */
   #grid {
     position:fixed;
-    top:0; left:0; right:0; bottom:140px;
+    top:60px; left:0; right:0; bottom:0;
     display:grid;
     grid-template-columns:repeat(27, 1fr);
     grid-template-rows:repeat(28, 1fr);
@@ -30,7 +30,7 @@
     display:flex;
     justify-content:center;
     align-items:center;
-    font-size:14px;
+    font-size:18px;
     transition:transform .4s ease, background .4s ease;
     cursor:pointer;
   }
@@ -40,30 +40,58 @@
     transform:scale(1.08);
   }
 
-  /* PANEL */
-  #panel {
+  /* BUTTONS */
+  #btn-top {
     position:fixed;
-    bottom:0;
-    left:0; right:0;
-    background:#000;
-    border-top:2px solid #7dd3fc;
-    padding:20px;
+    top:0; left:0; right:0;
+    height:60px;
     display:flex;
-    gap:10px;
     justify-content:center;
-    flex-wrap:wrap;
+    align-items:center;
+    gap:10px;
+    background:#000;
+    border-bottom:2px solid #7dd3fc;
+  }
+
+  #btn-left {
+    position:fixed;
+    top:60px; bottom:0; left:0;
+    width:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    background:#000;
+    border-right:2px solid #7dd3fc;
+  }
+
+  #btn-right {
+    position:fixed;
+    top:60px; bottom:0; right:0;
+    width:60px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    gap:10px;
+    background:#000;
+    border-left:2px solid #7dd3fc;
   }
 
   .btn {
     background:#0b1220;
     color:#7dd3fc;
     border:1px solid #1f2937;
-    padding:10px 16px;
-    font-size:15px;
+    padding:8px;
+    font-size:12px;
     cursor:pointer;
     border-radius:6px;
     transition:.2s;
+    width:48px;
+    text-align:center;
   }
+
   .btn:hover {
     background:#12263a;
     transform:scale(1.05);
@@ -73,35 +101,55 @@
 
 <body>
 
-<div id="grid"></div>
+<!-- BUTTONS -->
+<div id="btn-top">
+  <button class="btn" onclick="rotateAll()">Drehen</button>
+</div>
 
-<div id="panel">
-  <button class="btn" onclick="rotateAll()">Alle 756 drehen</button>
-  <button class="btn" onclick="colorAxioms()">Axiom‑Farben</button>
+<div id="btn-left">
+  <button class="btn" onclick="colorAxioms()">Axiome</button>
+</div>
+
+<div id="btn-right">
   <button class="btn" onclick="resetGrid()">Reset</button>
 </div>
 
+<!-- GRID -->
+<div id="grid"></div>
+
 <script>
-/* 756 GRID ERZEUGEN */
+/* 756 NC‑Magic Symbole */
+const symbols = [
+  "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
+  "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
+  "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
+  "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
+];
+
+/* GRID ERZEUGEN */
 const grid = document.getElementById("grid");
 const cells = [];
 
 for(let i=0;i<756;i++){
   const cell = document.createElement("div");
   cell.className = "cell";
-  cell.textContent = "⚙";
-  cell.dataset.index = i;
-  grid.appendChild(cell);
-  cells.push(cell);
 
+  /* Jedes Symbol anders */
+  cell.textContent = symbols[i % symbols.length];
+
+  /* Jedes Verhalten anders */
   cell.onclick = () => {
     const deg = Math.floor(Math.random()*360);
+    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
     cell.style.transform = "rotate(" + deg + "deg)";
-    cell.style.background = "#0b1220";
+    cell.style.background = col;
   };
+
+  grid.appendChild(cell);
+  cells.push(cell);
 }
 
-/* ALLE DREHEN */
+/* BUTTON FUNKTIONEN */
 function rotateAll(){
   cells.forEach(c=>{
     const deg = Math.floor(Math.random()*360);
@@ -109,23 +157,19 @@ function rotateAll(){
   });
 }
 
-/* AXIOM‑FARBEN */
 function colorAxioms(){
   cells.forEach((c,i)=>{
-    const ax = i % 6; // 6 Axiome
-
-    let color = "#ffffff"; // SET
-    if(ax === 1) color = "#66ffaa"; // H
-    if(ax === 2) color = "#66aaff"; // B
-    if(ax === 3) color = "#ffaa66"; // T
-    if(ax === 4) color = "#aa66ff"; // KI
-    if(ax === 5) color = "#ff6666"; // ER
-
+    const ax = i % 6;
+    let color = "#ffffff";
+    if(ax === 1) color = "#66ffaa";
+    if(ax === 2) color = "#66aaff";
+    if(ax === 3) color = "#ffaa66";
+    if(ax === 4) color = "#aa66ff";
+    if(ax === 5) color = "#ff6666";
     c.style.background = color;
   });
 }
 
-/* RESET */
 function resetGrid(){
   cells.forEach(c=>{
     c.style.transform = "rotate(0deg)";
