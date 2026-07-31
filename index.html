@@ -4,6 +4,90 @@
 <meta charset="utf-8">
 <title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<div id="axis-panel" style="
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  height:60px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  gap:6px;
+  background:#000;
+  border-top:2px solid #7dd3fc;
+  z-index:99999;
+"></div>
+function triggerAxis(axis, btn){
+    // Zufällige Move‑Qualität simulieren
+    const quality = Math.floor(Math.random()*3); // 0,1,2
+
+    if(quality === 0){
+        btn.style.background = "yellow"; // neutral
+        axisMoveNeutral(axis);
+    }
+    if(quality === 1){
+        btn.style.background = "green"; // gültiger Move
+        axisMoveGood(axis);
+    }
+    if(quality === 2){
+        btn.style.background = "red"; // ungültiger Move
+        axisMoveBad(axis);
+    }
+}
+function axisMoveNeutral(axis){
+    const start = axis * 28;
+    const end = start + 28;
+
+    for(let i=start; i<end; i++){
+        cells[i].style.background = "#333";
+    }
+}
+
+function axisMoveGood(axis){
+    const start = axis * 28;
+    const end = start + 28;
+
+    for(let i=start; i<end; i++){
+        cells[i].style.background = "#00aa00";
+        cells[i].style.transform = "scale(1.1)";
+    }
+
+    updateScore();
+}
+
+function axisMoveBad(axis){
+    const start = axis * 28;
+    const end = start + 28;
+
+    for(let i=start; i<end; i++){
+        cells[i].style.background = "#aa0000";
+        cells[i].style.transform = "rotate(10deg)";
+    }
+}
+
+  
+const axisPanel = document.getElementById("axis-panel");
+const axisButtons = [];
+
+for(let a=0; a<27; a++){
+    const btn = document.createElement("button");
+    btn.textContent = "A" + (a+1);
+    btn.style.background = "#444";
+    btn.style.color = "#fff";
+    btn.style.border = "1px solid #1f2937";
+    btn.style.padding = "6px 10px";
+    btn.style.cursor = "pointer";
+    btn.style.borderRadius = "4px";
+    btn.style.transition = ".2s";
+
+    btn.dataset.axis = a;
+
+    btn.onclick = () => triggerAxis(a, btn);
+
+    axisPanel.appendChild(btn);
+    axisButtons.push(btn);
+}
 
 <style>
   body {
