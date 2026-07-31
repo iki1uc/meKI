@@ -14,6 +14,18 @@
     overflow:hidden;
   }
 
+  /* SCORE */
+  #score {
+    position:fixed;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
+    color:#7dd3fc;
+    font-size:20px;
+    padding:10px;
+    z-index:99999;
+  }
+
   /* GRID 756 */
   #grid {
     position:fixed;
@@ -40,79 +52,34 @@
     transform:scale(1.08);
   }
 
-  /* BUTTONS */
-  #btn-top {
-    position:fixed;
-    top:0; left:0; right:0;
-    height:60px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    gap:10px;
-    background:#000;
-    border-bottom:2px solid #7dd3fc;
-  }
-
-  #btn-left {
-    position:fixed;
-    top:60px; bottom:0; left:0;
-    width:60px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    gap:10px;
-    background:#000;
-    border-right:2px solid #7dd3fc;
-  }
-
-  #btn-right {
-    position:fixed;
-    top:60px; bottom:0; right:0;
-    width:60px;
-    display:flex;
-    flex-direction:column;
-    justify-content:center;
-    align-items:center;
-    gap:10px;
-    background:#000;
-    border-left:2px solid #7dd3fc;
-  }
-
-  .btn {
+  /* DRAG BUTTONS */
+  .drag-btn {
+    position:absolute;
     background:#0b1220;
     color:#7dd3fc;
     border:1px solid #1f2937;
-    padding:8px;
-    font-size:12px;
+    padding:10px;
+    font-size:14px;
     cursor:pointer;
     border-radius:6px;
-    transition:.2s;
-    width:48px;
-    text-align:center;
+    transition:.15s;
+    z-index:99999;
+    user-select:none;
   }
-
-  .btn:hover {
-    background:#12263a;
-    transform:scale(1.05);
+  .drag-btn:active {
+    transform:scale(1.1);
   }
 </style>
 </head>
 
 <body>
 
-<!-- BUTTONS -->
-<div id="btn-top">
-  <button class="btn" onclick="rotateAll()">Drehen</button>
-</div>
+<div id="score">Score: 0</div>
 
-<div id="btn-left">
-  <button class="btn" onclick="colorAxioms()">Axiome</button>
-</div>
-
-<div id="btn-right">
-  <button class="btn" onclick="resetGrid()">Reset</button>
-</div>
+<!-- DRAGGABLE BUTTONS -->
+<button id="btn1" class="drag-btn" style="top:10px; left:10px;">Drehen</button>
+<button id="btn2" class="drag-btn" style="top:10px; right:10px;">Axiome</button>
+<button id="btn3" class="drag-btn" style="bottom:10px; left:50%; transform:translateX(-50%);">Reset</button>
 
 <!-- GRID -->
 <div id="grid"></div>
@@ -126,6 +93,13 @@ const symbols = [
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
 ];
 
+/* SCORE */
+let score = 0;
+function updateScore(){
+  score++;
+  document.getElementById("score").textContent = "Score: " + score;
+}
+
 /* GRID ERZEUGEN */
 const grid = document.getElementById("grid");
 const cells = [];
@@ -134,15 +108,25 @@ for(let i=0;i<756;i++){
   const cell = document.createElement("div");
   cell.className = "cell";
 
-  /* Jedes Symbol anders */
+  /* Symbol */
   cell.textContent = symbols[i % symbols.length];
 
-  /* Jedes Verhalten anders */
+  /* Verhalten */
   cell.onclick = () => {
     const deg = Math.floor(Math.random()*360);
     const col = "#" + Math.floor(Math.random()*16777215).toString(16);
+
     cell.style.transform = "rotate(" + deg + "deg)";
     cell.style.background = col;
+
+    /* Chess‑Profil */
+    if(i % 2 === 0){
+      cell.style.border = "2px solid #66ffaa";
+    } else {
+      cell.style.border = "2px solid #ffaa66";
+    }
+
+    updateScore();
   };
 
   grid.appendChild(cell);
@@ -176,6 +160,42 @@ function resetGrid(){
     c.style.background = "transparent";
   });
 }
+
+/* DRAG + SNAP LOGIK */
+function makeDraggable(btn){
+  let offsetX = 0, offsetY = 0, dragging = false;
+
+  btn.addEventListener("mousedown", e=>{
+    dragging = true;
+    offsetX = e.clientX - btn.offsetLeft;
+    offsetY = e.clientY - btn.offsetTop;
+
+    btn.style.transform = "translateY(-6px)";
+    setTimeout(()=>btn.style.transform = "translateY(0)", 120);
+  });
+
+  document.addEventListener("mousemove", e=>{
+    if(!dragging) return;
+    btn.style.left = (e.clientX - offsetX) + "px";
+    btn.style.top = (e.clientY - offsetY) + "px";
+  });
+
+  document.addEventListener("mouseup", ()=>{
+    if(!dragging) return;
+    dragging = false;
+
+    const snapSize = window.innerWidth / 3;
+    const x = Math.round(btn.offsetLeft / snapSize) * snapSize;
+    const y = Math.round(btn.offsetTop / snapSize) * snapSize;
+
+    btn.style.left = x + "px";
+    btn.style.top = y + "px";
+  });
+}
+
+makeDraggable(document.getElementById("btn1"));
+makeDraggable(document.getElementById("btn2"));
+makeDraggable(document.getElementById("btn3"));
 </script>
 
 </body>
