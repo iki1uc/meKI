@@ -4,290 +4,6 @@
 <meta charset="utf-8">
 <title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<div id="axis-panel" style="
-  position:fixed;
-  bottom:0;
-  left:0;
-  right:0;
-  height:60px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  gap:6px;
-  background:#000;
-  border-top:2px solid #7dd3fc;
-  z-index:99999;
-"></div>
-<div id="game-panel" style="
-  position:fixed;
-  bottom:70px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:10px;
-  z-index:99999;
-">
-</div>
-const gamePanel = document.getElementById("game-panel");
-const gameButtons = [];
-
-const gameNames = [
-  "Schach", "Skat", "Rommé",
-  "Jackpot", "Domino", "Combo",
-  "Bonus", "Axiom", "Orbit"
-];
-
-<div id="super-panel" style="
-  position:fixed;
-  bottom:80px;
-  left:50%;
-  transform:translateX(-50%);
-  display:flex;
-  gap:12px;
-  z-index:99999;
-">
-</div>
-const superPanel = document.getElementById("super-panel");
-const superButtons = [];
-
-const superNames = [
-  "Schach", "Skat", "Rommé",
-  "Jackpot", "Domino", "Combo",
-  "Bonus", "Axiom", "Orbit"
-];
-
-for(let i=0;i<9;i++){
-    const btn = document.createElement("button");
-    btn.textContent = superNames[i];
-    btn.style.background = "#0b1220";
-    btn.style.color = "#7dd3fc";
-    btn.style.border = "1px solid #1f2937";
-    btn.style.padding = "12px 18px";
-    btn.style.cursor = "pointer";
-    btn.style.borderRadius = "8px";
-    btn.style.transition = ".2s";
-
-    btn.onclick = () => triggerSuper(i);
-
-    superPanel.appendChild(btn);
-    superButtons.push(btn);
-}
-function triggerSuper(i){
-    const r = Math.floor(Math.random()*4);
-
-    if(r === 0) superChess(i);
-    if(r === 1) superSkat(i);
-    if(r === 2) superRome(i);
-    if(r === 3) superJackpot(i);
-}
-function superChess(i){
-    const axis = Math.floor(Math.random()*27);
-
-    // 6D‑Move: Achse + Orbit
-    axisMoveGood(axis);
-
-    // Figur auswählen
-    const pieces = ["König","Dame","Turm","Springer","Läufer"];
-    const piece = pieces[Math.floor(Math.random()*pieces.length)];
-
-    superButtons[i].textContent = "Schach: " + piece;
-
-    score += 4;
-    updateScore();
-}
-function superSkat(i){
-    const cards = ["♥","♦","♣","♠"];
-    const card = cards[Math.floor(Math.random()*cards.length)];
-
-    superButtons[i].textContent = "Skat: " + card;
-
-    score += 3;
-    updateScore();
-}
-function superRome(i){
-    const num = Math.floor(Math.random()*13)+1;
-    const col = ["red","blue","green"][Math.floor(Math.random()*3)];
-
-    superButtons[i].style.background = col;
-    superButtons[i].textContent = "Rommé: " + num;
-
-    score += 2;
-    updateScore();
-}
-function superJackpot(i){
-    const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
-    const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
-
-    superButtons[i].textContent = "Jackpot: " + sym;
-
-    const hits = Math.floor(Math.random()*10)+1;
-
-    for(let h=0; h<hits; h++){
-        const cellIndex = Math.floor(Math.random()*756);
-        cells[cellIndex].style.background = "#ffaa00";
-        cells[cellIndex].style.transform = "scale(1.2)";
-    }
-
-    score += hits * 5;
-    updateScore();
-}
-<div id="jackpot-slot" style="
-  position:fixed;
-  bottom:20px;
-  left:50%;
-  transform:translateX(-50%);
-  color:#ffaa00;
-  font-size:26px;
-  z-index:99999;
-">
-Jackpot: —
-</div>
-function updateJackpot(sym){
-    document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
-}
-updateJackpot(sym);
-
-
-  
-for(let i=0;i<9;i++){
-    const btn = document.createElement("button");
-    btn.textContent = gameNames[i];
-    btn.style.background = "#0b1220";
-    btn.style.color = "#7dd3fc";
-    btn.style.border = "1px solid #1f2937";
-    btn.style.padding = "10px 14px";
-    btn.style.cursor = "pointer";
-    btn.style.borderRadius = "6px";
-    btn.style.transition = ".2s";
-
-    btn.onclick = () => triggerGame(i);
-
-    gamePanel.appendChild(btn);
-    gameButtons.push(btn);
-}
-function triggerGame(i){
-    const r = Math.floor(Math.random()*4); // 0–3
-
-    if(r === 0) gameChess(i);
-    if(r === 1) gameSkat(i);
-    if(r === 2) gameRome(i);
-    if(r === 3) gameJackpot(i);
-}
-function gameChess(i){
-    const axis = Math.floor(Math.random()*27);
-    axisMoveGood(axis);
-    updateScore();
-}
-function gameSkat(i){
-    const cards = ["♥","♦","♣","♠"];
-    const card = cards[Math.floor(Math.random()*cards.length)];
-
-    gameButtons[i].textContent = "Skat " + card;
-    score += 3;
-    updateScore();
-}
-function gameRome(i){
-    const num = Math.floor(Math.random()*13)+1;
-    const col = ["red","blue","green"][Math.floor(Math.random()*3)];
-
-    gameButtons[i].style.background = col;
-    gameButtons[i].textContent = "Rommé " + num;
-
-    score += 2;
-    updateScore();
-}
-function gameJackpot(i){
-    const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
-    const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
-
-    gameButtons[i].textContent = "Jackpot " + sym;
-
-    // Domino‑Treffer
-    const hits = Math.floor(Math.random()*10)+1;
-
-    for(let h=0; h<hits; h++){
-        const cellIndex = Math.floor(Math.random()*756);
-        cells[cellIndex].style.background = "#ffaa00";
-        cells[cellIndex].style.transform = "scale(1.2)";
-    }
-
-    score += hits * 5;
-    updateScore();
-}
-
-  
-  
-  
-  function triggerAxis(axis, btn){
-    // Zufällige Move‑Qualität simulieren
-    const quality = Math.floor(Math.random()*3); // 0,1,2
-
-    if(quality === 0){
-        btn.style.background = "yellow"; // neutral
-        axisMoveNeutral(axis);
-    }
-    if(quality === 1){
-        btn.style.background = "green"; // gültiger Move
-        axisMoveGood(axis);
-    }
-    if(quality === 2){
-        btn.style.background = "red"; // ungültiger Move
-        axisMoveBad(axis);
-    }
-}
-function axisMoveNeutral(axis){
-    const start = axis * 28;
-    const end = start + 28;
-
-    for(let i=start; i<end; i++){
-        cells[i].style.background = "#333";
-    }
-}
-
-function axisMoveGood(axis){
-    const start = axis * 28;
-    const end = start + 28;
-
-    for(let i=start; i<end; i++){
-        cells[i].style.background = "#00aa00";
-        cells[i].style.transform = "scale(1.1)";
-    }
-
-    updateScore();
-}
-
-function axisMoveBad(axis){
-    const start = axis * 28;
-    const end = start + 28;
-
-    for(let i=start; i<end; i++){
-        cells[i].style.background = "#aa0000";
-        cells[i].style.transform = "rotate(10deg)";
-    }
-}
-
-  
-const axisPanel = document.getElementById("axis-panel");
-const axisButtons = [];
-
-for(let a=0; a<27; a++){
-    const btn = document.createElement("button");
-    btn.textContent = "A" + (a+1);
-    btn.style.background = "#444";
-    btn.style.color = "#fff";
-    btn.style.border = "1px solid #1f2937";
-    btn.style.padding = "6px 10px";
-    btn.style.cursor = "pointer";
-    btn.style.borderRadius = "4px";
-    btn.style.transition = ".2s";
-
-    btn.dataset.axis = a;
-
-    btn.onclick = () => triggerAxis(a, btn);
-
-    axisPanel.appendChild(btn);
-    axisButtons.push(btn);
-}
 
 <style>
   body {
@@ -298,7 +14,6 @@ for(let a=0; a<27; a++){
     overflow:hidden;
   }
 
-  /* SCORE */
   #score {
     position:fixed;
     top:0;
@@ -310,7 +25,6 @@ for(let a=0; a<27; a++){
     z-index:99999;
   }
 
-  /* GRID 756 */
   #grid {
     position:fixed;
     top:60px; left:0; right:0; bottom:0;
@@ -331,27 +45,49 @@ for(let a=0; a<27; a++){
     cursor:pointer;
   }
 
-  .cell:hover {
-    background:#12263a;
-    transform:scale(1.08);
+  #axis-panel {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:60px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    background:#000;
+    border-top:2px solid #7dd3fc;
+    z-index:99999;
   }
 
-  /* DRAG BUTTONS */
-  .drag-btn {
-    position:absolute;
+  #super-panel {
+    position:fixed;
+    bottom:70px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:12px;
+    z-index:99999;
+  }
+
+  #jackpot-slot {
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#ffaa00;
+    font-size:26px;
+    z-index:99999;
+  }
+
+  button {
     background:#0b1220;
     color:#7dd3fc;
     border:1px solid #1f2937;
-    padding:10px;
-    font-size:14px;
+    padding:10px 14px;
     cursor:pointer;
     border-radius:6px;
-    transition:.15s;
-    z-index:99999;
-    user-select:none;
-  }
-  .drag-btn:active {
-    transform:scale(1.1);
+    transition:.2s;
   }
 </style>
 </head>
@@ -359,17 +95,14 @@ for(let a=0; a<27; a++){
 <body>
 
 <div id="score">Score: 0</div>
+<div id="axis-panel"></div>
+<div id="super-panel"></div>
+<div id="jackpot-slot">Jackpot: —</div>
 
-<!-- DRAGGABLE BUTTONS -->
-<button id="btn1" class="drag-btn" style="top:10px; left:10px;">Drehen</button>
-<button id="btn2" class="drag-btn" style="top:10px; right:10px;">Axiome</button>
-<button id="btn3" class="drag-btn" style="bottom:10px; left:50%; transform:translateX(-50%);">Reset</button>
-
-<!-- GRID -->
 <div id="grid"></div>
 
 <script>
-/* 756 NC‑Magic Symbole */
+/* GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
@@ -384,18 +117,15 @@ function updateScore(){
   document.getElementById("score").textContent = "Score: " + score;
 }
 
-/* GRID ERZEUGEN */
+/* GRID */
 const grid = document.getElementById("grid");
 const cells = [];
 
 for(let i=0;i<756;i++){
   const cell = document.createElement("div");
   cell.className = "cell";
-
-  /* Symbol */
   cell.textContent = symbols[i % symbols.length];
 
-  /* Verhalten */
   cell.onclick = () => {
     const deg = Math.floor(Math.random()*360);
     const col = "#" + Math.floor(Math.random()*16777215).toString(16);
@@ -403,7 +133,6 @@ for(let i=0;i<756;i++){
     cell.style.transform = "rotate(" + deg + "deg)";
     cell.style.background = col;
 
-    /* Chess‑Profil */
     if(i % 2 === 0){
       cell.style.border = "2px solid #66ffaa";
     } else {
@@ -417,69 +146,145 @@ for(let i=0;i<756;i++){
   cells.push(cell);
 }
 
-/* BUTTON FUNKTIONEN */
-function rotateAll(){
-  cells.forEach(c=>{
-    const deg = Math.floor(Math.random()*360);
-    c.style.transform = "rotate(" + deg + "deg)";
-  });
+/* AXIS PANEL */
+const axisPanel = document.getElementById("axis-panel");
+
+for(let a=0; a<27; a++){
+  const btn = document.createElement("button");
+  btn.textContent = "A" + (a+1);
+
+  btn.onclick = () => triggerAxis(a, btn);
+
+  axisPanel.appendChild(btn);
 }
 
-function colorAxioms(){
-  cells.forEach((c,i)=>{
-    const ax = i % 6;
-    let color = "#ffffff";
-    if(ax === 1) color = "#66ffaa";
-    if(ax === 2) color = "#66aaff";
-    if(ax === 3) color = "#ffaa66";
-    if(ax === 4) color = "#aa66ff";
-    if(ax === 5) color = "#ff6666";
-    c.style.background = color;
-  });
+function triggerAxis(axis, btn){
+  const quality = Math.floor(Math.random()*3);
+
+  if(quality === 0){
+    btn.style.background = "yellow";
+    axisMoveNeutral(axis);
+  }
+  if(quality === 1){
+    btn.style.background = "green";
+    axisMoveGood(axis);
+  }
+  if(quality === 2){
+    btn.style.background = "red";
+    axisMoveBad(axis);
+  }
 }
 
-function resetGrid(){
-  cells.forEach(c=>{
-    c.style.transform = "rotate(0deg)";
-    c.style.background = "transparent";
-  });
+function axisMoveNeutral(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#333";
+  }
 }
 
-/* DRAG + SNAP LOGIK */
-function makeDraggable(btn){
-  let offsetX = 0, offsetY = 0, dragging = false;
+function axisMoveGood(axis){
+  const start = axis * 28;
+  const end = start + 28;
 
-  btn.addEventListener("mousedown", e=>{
-    dragging = true;
-    offsetX = e.clientX - btn.offsetLeft;
-    offsetY = e.clientY - btn.offsetTop;
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#00aa00";
+    cells[i].style.transform = "scale(1.1)";
+  }
 
-    btn.style.transform = "translateY(-6px)";
-    setTimeout(()=>btn.style.transform = "translateY(0)", 120);
-  });
-
-  document.addEventListener("mousemove", e=>{
-    if(!dragging) return;
-    btn.style.left = (e.clientX - offsetX) + "px";
-    btn.style.top = (e.clientY - offsetY) + "px";
-  });
-
-  document.addEventListener("mouseup", ()=>{
-    if(!dragging) return;
-    dragging = false;
-
-    const snapSize = window.innerWidth / 3;
-    const x = Math.round(btn.offsetLeft / snapSize) * snapSize;
-    const y = Math.round(btn.offsetTop / snapSize) * snapSize;
-
-    btn.style.left = x + "px";
-    btn.style.top = y + "px";
-  });
+  updateScore();
 }
 
-makeDraggable(document.getElementById("btn1"));
-makeDraggable(document.getElementById("btn2"));
-makeDraggable(document.getElementById("btn3"));
+function axisMoveBad(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#aa0000";
+    cells[i].style.transform = "rotate(10deg)";
+  }
+}
+
+/* SUPER PANEL */
+const superPanel = document.getElementById("super-panel");
+const superNames = [
+  "Schach","Skat","Rommé",
+  "Jackpot","Domino","Combo",
+  "Bonus","Axiom","Orbit"
+];
+
+for(let i=0;i<9;i++){
+  const btn = document.createElement("button");
+  btn.textContent = superNames[i];
+
+  btn.onclick = () => triggerSuper(i);
+
+  superPanel.appendChild(btn);
+}
+
+function triggerSuper(i){
+  const r = Math.floor(Math.random()*4);
+
+  if(r === 0) superChess(i);
+  if(r === 1) superSkat(i);
+  if(r === 2) superRome(i);
+  if(r === 3) superJackpot(i);
+}
+
+function superChess(i){
+  const axis = Math.floor(Math.random()*27);
+  axisMoveGood(axis);
+
+  const pieces = ["König","Dame","Turm","Springer","Läufer"];
+  const piece = pieces[Math.floor(Math.random()*pieces.length)];
+
+  superPanel.children[i].textContent = "Schach: " + piece;
+
+  score += 4;
+  updateScore();
+}
+
+function superSkat(i){
+  const cards = ["♥","♦","♣","♠"];
+  const card = cards[Math.floor(Math.random()*cards.length)];
+
+  superPanel.children[i].textContent = "Skat: " + card;
+
+  score += 3;
+  updateScore();
+}
+
+function superRome(i){
+  const num = Math.floor(Math.random()*13)+1;
+  const col = ["red","blue","green"][Math.floor(Math.random()*3)];
+
+  superPanel.children[i].style.background = col;
+  superPanel.children[i].textContent = "Rommé: " + num;
+
+  score += 2;
+  updateScore();
+}
+
+function superJackpot(i){
+  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+
+  superPanel.children[i].textContent = "Jackpot: " + sym;
+
+  const hits = Math.floor(Math.random()*10)+1;
+
+  for(let h=0; h<hits; h++){
+    const cellIndex = Math.floor(Math.random()*756);
+    cells[cellIndex].style.background = "#ffaa00";
+    cells[cellIndex].style.transform = "scale(1.2)";
+  }
+
+  score += hits * 5;
+  updateScore();
+
+  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
+}
 </script>
 
 </body>
