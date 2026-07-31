@@ -18,7 +18,95 @@
   border-top:2px solid #7dd3fc;
   z-index:99999;
 "></div>
-function triggerAxis(axis, btn){
+<div id="game-panel" style="
+  position:fixed;
+  bottom:70px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:10px;
+  z-index:99999;
+">
+</div>
+const gamePanel = document.getElementById("game-panel");
+const gameButtons = [];
+
+const gameNames = [
+  "Schach", "Skat", "Rommé",
+  "Jackpot", "Domino", "Combo",
+  "Bonus", "Axiom", "Orbit"
+];
+
+for(let i=0;i<9;i++){
+    const btn = document.createElement("button");
+    btn.textContent = gameNames[i];
+    btn.style.background = "#0b1220";
+    btn.style.color = "#7dd3fc";
+    btn.style.border = "1px solid #1f2937";
+    btn.style.padding = "10px 14px";
+    btn.style.cursor = "pointer";
+    btn.style.borderRadius = "6px";
+    btn.style.transition = ".2s";
+
+    btn.onclick = () => triggerGame(i);
+
+    gamePanel.appendChild(btn);
+    gameButtons.push(btn);
+}
+function triggerGame(i){
+    const r = Math.floor(Math.random()*4); // 0–3
+
+    if(r === 0) gameChess(i);
+    if(r === 1) gameSkat(i);
+    if(r === 2) gameRome(i);
+    if(r === 3) gameJackpot(i);
+}
+function gameChess(i){
+    const axis = Math.floor(Math.random()*27);
+    axisMoveGood(axis);
+    updateScore();
+}
+function gameSkat(i){
+    const cards = ["♥","♦","♣","♠"];
+    const card = cards[Math.floor(Math.random()*cards.length)];
+
+    gameButtons[i].textContent = "Skat " + card;
+    score += 3;
+    updateScore();
+}
+function gameRome(i){
+    const num = Math.floor(Math.random()*13)+1;
+    const col = ["red","blue","green"][Math.floor(Math.random()*3)];
+
+    gameButtons[i].style.background = col;
+    gameButtons[i].textContent = "Rommé " + num;
+
+    score += 2;
+    updateScore();
+}
+function gameJackpot(i){
+    const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+    const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+
+    gameButtons[i].textContent = "Jackpot " + sym;
+
+    // Domino‑Treffer
+    const hits = Math.floor(Math.random()*10)+1;
+
+    for(let h=0; h<hits; h++){
+        const cellIndex = Math.floor(Math.random()*756);
+        cells[cellIndex].style.background = "#ffaa00";
+        cells[cellIndex].style.transform = "scale(1.2)";
+    }
+
+    score += hits * 5;
+    updateScore();
+}
+
+  
+  
+  
+  function triggerAxis(axis, btn){
     // Zufällige Move‑Qualität simulieren
     const quality = Math.floor(Math.random()*3); // 0,1,2
 
