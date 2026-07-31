@@ -31,3 +31,32 @@
   transform:scale(1.05);
 }
 </style>
+<script type="module">
+import { SWITCHES } from "./SETI.js";
+
+const box = document.getElementById("iki-romance");
+
+// Jeder Schalter wird ein romantischer Moment
+SWITCHES.forEach(sw => {
+    const btn = document.createElement("button");
+    btn.className = "iki-rom-btn";
+    btn.textContent = sw.name;
+
+    btn.onclick = () => {
+        const result = sw.run();
+
+        const msg = `${sw.name}\n\n${sw.desc}\n\nÜbernehmen?`;
+        if(result !== false){
+            if(confirm(msg)){
+                console.log("Übernommen:", sw.name);
+            } else {
+                console.log("Weiter suchen…");
+            }
+        } else {
+            console.log("Schalter konnte nicht greifen:", sw.name);
+        }
+    };
+
+    box.appendChild(btn);
+});
+</script>
