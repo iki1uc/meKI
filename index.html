@@ -3,20 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>ANKER – S01 · iki1uc</title>
-function testOrbit(cibik, hbt, link) {
-    console.log("=== ORBIT TEST START ===");
-
-    hbt.setAxis("H");
-    link.sync(); // IX
-    hbt.setAxis("B");
-    link.sync(); // XI
-    hbt.setAxis("T");
-    link.sync(); // X4
-
-    cibik.orbitAll(); // IX + XI + X4
-
-    console.log("=== ORBIT TEST END ===");
-}
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>ANKER – S01 · iki1uc</title>
 
 <style>
 body { background:#000; color:#0f0; font-family:monospace; padding:40px; }
@@ -38,106 +29,41 @@ a { color:#6cf; text-decoration:none; font-weight:bold; }
 <script src="IDneutral.js"></script>
 <script src="IDpook.js"></script>
 
-</head>
-
-<body>
-
-<h1>ANKER – S01 · iki1uc</h1>
-
-<!-- ACHSEN STATUS -->
-<div class="block">
-    <div class="title">Stabilisationsachse</div>
-    <p id="axis-status">Lade Achsen…</p>
-</div>
-
-<!-- IDENTITÄT -->
-<div class="block">
-    <div class="title">Identität</div>
-    <p>
-        <a href="id.html">→ ANKER‑Identität öffnen</a>
-    </p>
-    <pre id="id-status"></pre>
-</div>
-
-<!-- ACHSEN LISTE -->
-<div class="block">
-    <div class="title">Stabilisierte Achsen</div>
-    <pre id="axis-list"></pre>
-</div>
-
-<!-- RESPO STATUS -->
-<div class="block">
-    <div class="title">RESPO‑Status</div>
-    <pre id="respo-status"></pre>
-</div>
-
-<!-- SYSTEM STATUS -->
-<div class="block">
-    <div class="title">System‑Status</div>
-    <pre id="system-status"></pre>
-</div>
-
 <script>
 (async function () {
 
-    /* -------------------------------
-       ANKER DATEN LADEN
-    --------------------------------*/
-    const anker = await fetch("ANKER.json").then(r => r.json()).catch(() => null);
-    const raw = await fetch("ANKER.raw").then(r => r.text()).catch(() => "");
+    const cibik = new CIBIK();
+    await cibik.init();
 
-    document.getElementById("axis-list").innerText = raw || "Keine Achsen gefunden";
+    const hbt = new ContinuumHBT();
+    const link = new ContinuumLink(cibik.kernel, hbt);
 
+    function testOrbit() {
+        console.log("=== ORBIT TEST START ===");
 
-    /* -------------------------------
-       AXI ENGINE
-    --------------------------------*/
-    const axi = AXI_CORE();
-    document.getElementById("axis-status").innerText =
-        axi ? "Achsen stabil" : "Achsenfehler";
+        hbt.setAxis("H");
+        link.sync(); // IX
 
+        hbt.setAxis("B");
+        link.sync(); // XI
 
-    /* -------------------------------
-       RESPO ENGINE
-    --------------------------------*/
-    const respo = RESPO_CORE(anker || {});
-    document.getElementById("respo-status").innerText =
-        `Score: ${respo.score}\nStatus: ${respo.ok ? "STABIL" : "KRITISCH"}`;
+        hbt.setAxis("T");
+        link.sync(); // X4
 
+        cibik.orbitAll(); // IX + XI + X4
 
-    /* -------------------------------
-       ID MODUS ERKENNEN
-    --------------------------------*/
-    let idMode = "neutral";
-    if (ID_KOOP?.active) idMode = "koop";
-    if (ID_POOK?.active) idMode = "pook";
+        console.log("=== ORBIT TEST END ===");
+    }
 
-    const idMap = {
-        koop: ID_KOOP,
-        neutral: ID_NEUTRAL,
-        pook: ID_POOK
-    };
-
-    document.getElementById("id-status").innerText =
-        `Modus: ${idMode.toUpperCase()}\nInfo: ${idMap[idMode].info()}`;
-
-
-    /* -------------------------------
-       SYSTEM STATUS
-    --------------------------------*/
-    const tem = TEM_CORE();
-    const run8 = RUN8();
-function validateCSV(layer) {
-    return layer.length > 0 && layer[0].length >= 2;
-}
-
-console.log("Layer 1 OK:", validateCSV(cibik.layer1));
+    testOrbit()
+        
+        ;console.log("Layer 1 OK:", validateCSV(cibik.layer1));
 console.log("Layer 2 OK:", validateCSV(cibik.layer2));
-console.log("Layer 3 OK:", validateCSV(layer3));
-<script src="ernte.js"></script>      <!-- 4 -->
-<script src="cube.js"></script>       <!-- 0 + 1 -->
-<script src="id.html"></script>       <!-- 2 -->
+console.log("Layer 3 OK:", validateCSV(cibik.layer3));
 
+
+})();
+</script>
     document.getElementById("system-status").innerText =
         `Zeit: ${tem.timestamp}\nKernel: ${run8.run}\nSystem: OK`;
 
