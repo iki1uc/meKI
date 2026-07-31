@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · Continuum‑Clock · 0‑Schalter‑Detector</title>
+<title>meKI · 756 Continuum Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -14,29 +14,33 @@
     overflow:hidden;
   }
 
-  #clock {
+  /* 756 GRID: 729 Achsenpunkte + 27 Kontrollpunkte */
+  #grid {
     position:fixed;
-    top:0; left:0; right:0; bottom:0;
+    top:0; left:0; right:0; bottom:140px;
+    display:grid;
+    grid-template-columns:repeat(27, 1fr);
+    grid-template-rows:repeat(28, 1fr);
+    gap:3px;
+    padding:10px;
+  }
+
+  .cell {
+    border:1px solid #1f2937;
     display:flex;
     justify-content:center;
     align-items:center;
-    flex-direction:column;
-    background:radial-gradient(circle at center, #0b1220, #000);
+    font-size:14px;
+    transition:transform .4s ease, background .4s ease;
+    cursor:pointer;
   }
 
-  .gear {
-    width:140px;
-    height:140px;
-    border:6px solid #7dd3fc;
-    border-radius:50%;
-    margin:20px;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    font-size:22px;
-    transition:transform 1s linear;
+  .cell:hover {
+    background:#12263a;
+    transform:scale(1.08);
   }
 
+  /* PANEL */
   #panel {
     position:fixed;
     bottom:0;
@@ -69,67 +73,64 @@
 
 <body>
 
-<div id="clock">
-  <div id="sun" class="gear">☀</div>
-  <div id="moon" class="gear">☾</div>
-  <div id="earth" class="gear">⊕</div>
-
-  <pre id="info"></pre>
-</div>
+<div id="grid"></div>
 
 <div id="panel">
-  <button class="btn" onclick="rotateSun()">Sonne</button>
-  <button class="btn" onclick="rotateMoon()">Mond</button>
-  <button class="btn" onclick="rotateEarth()">Erde</button>
-  <button class="btn" onclick="axiom()">Axiom</button>
-  <button class="btn" onclick="detect()">0‑Schalter‑Check</button>
-  <button class="btn" onclick="resetClock()">Reset</button>
+  <button class="btn" onclick="rotateAll()">Alle 756 drehen</button>
+  <button class="btn" onclick="colorAxioms()">Axiom‑Farben</button>
+  <button class="btn" onclick="resetGrid()">Reset</button>
 </div>
 
 <script>
-function rotateSun(){
-  document.getElementById("sun").style.transform =
-    "rotate(" + (Math.random()*360) + "deg)";
-}
-function rotateMoon(){
-  document.getElementById("moon").style.transform =
-    "rotate(" + (Math.random()*360) + "deg)";
-}
-function rotateEarth(){
-  document.getElementById("earth").style.transform =
-    "rotate(" + (Math.random()*360) + "deg)";
+/* 756 GRID ERZEUGEN */
+const grid = document.getElementById("grid");
+const cells = [];
+
+for(let i=0;i<756;i++){
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.textContent = "⚙";
+  cell.dataset.index = i;
+  grid.appendChild(cell);
+  cells.push(cell);
+
+  cell.onclick = () => {
+    const deg = Math.floor(Math.random()*360);
+    cell.style.transform = "rotate(" + deg + "deg)";
+    cell.style.background = "#0b1220";
+  };
 }
 
-function resetClock(){
-  ["sun","moon","earth"].forEach(id=>{
-    document.getElementById(id).style.transform="rotate(0deg)";
+/* ALLE DREHEN */
+function rotateAll(){
+  cells.forEach(c=>{
+    const deg = Math.floor(Math.random()*360);
+    c.style.transform = "rotate(" + deg + "deg)";
   });
-  document.getElementById("info").textContent="";
 }
 
-function axiom(){
-  const info = document.getElementById("info");
-  const deg = Math.floor(Math.random()*360);
+/* AXIOM‑FARBEN */
+function colorAxioms(){
+  cells.forEach((c,i)=>{
+    const ax = i % 6; // 6 Axiome
 
-  let ax="H";
-  if(deg<120) ax="H";
-  else if(deg<240) ax="B";
-  else ax="T";
+    let color = "#ffffff"; // SET
+    if(ax === 1) color = "#66ffaa"; // H
+    if(ax === 2) color = "#66aaff"; // B
+    if(ax === 3) color = "#ffaa66"; // T
+    if(ax === 4) color = "#aa66ff"; // KI
+    if(ax === 5) color = "#ff6666"; // ER
 
-  info.textContent = "Axiom: " + ax + " (" + deg + "°)";
+    c.style.background = color;
+  });
 }
 
-function detect(){
-  const info = document.getElementById("info");
-  const panel = document.getElementById("panel");
-
-  const count = panel.querySelectorAll(".btn").length;
-
-  if(count === 0){
-    info.textContent = "Continuum‑Zustand: 0‑Schalter\nAxiom: NULL\nZeitlinie: Reset";
-  } else {
-    info.textContent = "Schalter aktiv: " + count;
-  }
+/* RESET */
+function resetGrid(){
+  cells.forEach(c=>{
+    c.style.transform = "rotate(0deg)";
+    c.style.background = "transparent";
+  });
 }
 </script>
 
