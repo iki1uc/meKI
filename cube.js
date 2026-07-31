@@ -62,3 +62,20 @@ class CIBIK {
 
 const cibik = new CIBIK();
 cibik.init();
+class ContinuumHBT {
+    constructor() {
+        this.axis = "H"; // Höhe als Start
+    }
+
+    setAxis(a) {
+        this.axis = a;
+        console.log("Continuum-Achse gesetzt:", a);
+    }
+
+    rotate() {
+        if (this.axis === "H") this.axis = "B";
+        else if (this.axis === "B") this.axis = "T";
+        else this.axis = "H";
+        console.log("Achse rotiert:", this.axis);
+    }
+}
