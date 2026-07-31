@@ -79,3 +79,26 @@ class ContinuumHBT {
         console.log("Achse rotiert:", this.axis);
     }
 }
+class ContinuumLink {
+    constructor(kernel, hbt) {
+        this.kernel = kernel;
+        this.hbt = hbt;
+    }
+
+    sync() {
+        // H = Höhe → IX
+        if (this.hbt.axis === "H") {
+            this.kernel.activateOrbit("IX");
+        }
+
+        // B = Breite → XI
+        if (this.hbt.axis === "B") {
+            this.kernel.activateOrbit("XI");
+        }
+
+        // T = Tiefe → X4
+        if (this.hbt.axis === "T") {
+            this.kernel.activateOrbit("X4");
+        }
+    }
+}
