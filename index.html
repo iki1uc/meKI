@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · Continuum‑Clock · Sonne · Mond · Erde</title>
+<title>meKI · Continuum‑Clock · 0‑Schalter‑Detector</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -11,11 +11,9 @@
     color:#7dd3fc;
     font-family:monospace;
     margin:0;
-    padding:0;
     overflow:hidden;
   }
 
-  /* CLOCK FIELD */
   #clock {
     position:fixed;
     top:0; left:0; right:0; bottom:0;
@@ -24,10 +22,8 @@
     align-items:center;
     flex-direction:column;
     background:radial-gradient(circle at center, #0b1220, #000);
-    transition:all .6s ease;
   }
 
-  /* ZAHNRÄDER */
   .gear {
     width:140px;
     height:140px;
@@ -41,7 +37,6 @@
     transition:transform 1s linear;
   }
 
-  /* PANEL */
   #panel {
     position:fixed;
     bottom:0;
@@ -83,57 +78,58 @@
 </div>
 
 <div id="panel">
-  <button class="btn" onclick="rotateSun()">Sonne drehen</button>
-  <button class="btn" onclick="rotateMoon()">Mond drehen</button>
-  <button class="btn" onclick="rotateEarth()">Erde drehen</button>
-  <button class="btn" onclick="axiom()">Axiom‑Check</button>
+  <button class="btn" onclick="rotateSun()">Sonne</button>
+  <button class="btn" onclick="rotateMoon()">Mond</button>
+  <button class="btn" onclick="rotateEarth()">Erde</button>
+  <button class="btn" onclick="axiom()">Axiom</button>
+  <button class="btn" onclick="detect()">0‑Schalter‑Check</button>
   <button class="btn" onclick="resetClock()">Reset</button>
 </div>
 
 <script>
-/* ZAHNRAD‑ROTATION */
 function rotateSun(){
-  const s = document.getElementById("sun");
-  s.style.transform = "rotate(" + (Math.random()*360) + "deg)";
+  document.getElementById("sun").style.transform =
+    "rotate(" + (Math.random()*360) + "deg)";
 }
-
 function rotateMoon(){
-  const m = document.getElementById("moon");
-  m.style.transform = "rotate(" + (Math.random()*360) + "deg)";
+  document.getElementById("moon").style.transform =
+    "rotate(" + (Math.random()*360) + "deg)";
 }
-
 function rotateEarth(){
-  const e = document.getElementById("earth");
-  e.style.transform = "rotate(" + (Math.random()*360) + "deg)";
+  document.getElementById("earth").style.transform =
+    "rotate(" + (Math.random()*360) + "deg)";
 }
 
-/* RESET */
 function resetClock(){
-  document.getElementById("sun").style.transform = "rotate(0deg)";
-  document.getElementById("moon").style.transform = "rotate(0deg)";
-  document.getElementById("earth").style.transform = "rotate(0deg)";
-  document.getElementById("info").textContent = "";
+  ["sun","moon","earth"].forEach(id=>{
+    document.getElementById(id).style.transform="rotate(0deg)";
+  });
+  document.getElementById("info").textContent="";
 }
 
-/* AXIOM‑CHECK (Himmelsrichtung + Sonne + Mond + Erde) */
 function axiom(){
   const info = document.getElementById("info");
+  const deg = Math.floor(Math.random()*360);
 
-  const sunDeg = Math.floor(Math.random()*360);
-  const moonDeg = Math.floor(Math.random()*360);
-  const earthDeg = Math.floor(Math.random()*360);
+  let ax="H";
+  if(deg<120) ax="H";
+  else if(deg<240) ax="B";
+  else ax="T";
 
-  let axiom = "H";
+  info.textContent = "Axiom: " + ax + " (" + deg + "°)";
+}
 
-  if(sunDeg < 120) axiom = "H";       // Osten
-  else if(sunDeg < 240) axiom = "B";  // Süden
-  else axiom = "T";                   // Westen
+function detect(){
+  const info = document.getElementById("info");
+  const panel = document.getElementById("panel");
 
-  info.textContent =
-    "Sonne: " + sunDeg + "°\n" +
-    "Mond: " + moonDeg + "°\n" +
-    "Erde: " + earthDeg + "°\n\n" +
-    "Aktives Axiom: " + axiom;
+  const count = panel.querySelectorAll(".btn").length;
+
+  if(count === 0){
+    info.textContent = "Continuum‑Zustand: 0‑Schalter\nAxiom: NULL\nZeitlinie: Reset";
+  } else {
+    info.textContent = "Schalter aktiv: " + count;
+  }
 }
 </script>
 
