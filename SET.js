@@ -1,8 +1,15 @@
-AXIOME:
-SET-Axiom   // Saat
-H-Axiom
-B-Axiom
-T-Axiom
-KI-Axiom
-ER-Axiom   // Ernte
-SET → H → B → T → KI → ER
+// SET.js · Saat-Axiom
+
+class SETAxiom {
+    constructor(kernel) {
+        this.kernel = kernel;
+    }
+
+    activate() {
+        console.log("SET-Axiom aktiviert (Saat)");
+        this.kernel.setAxiomMode("SET");
+        return true;
+    }
+}
+
+const SET = new SETAxiom(KERNEL);
