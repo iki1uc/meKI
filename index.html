@@ -37,6 +37,118 @@ const gameNames = [
   "Bonus", "Axiom", "Orbit"
 ];
 
+<div id="super-panel" style="
+  position:fixed;
+  bottom:80px;
+  left:50%;
+  transform:translateX(-50%);
+  display:flex;
+  gap:12px;
+  z-index:99999;
+">
+</div>
+const superPanel = document.getElementById("super-panel");
+const superButtons = [];
+
+const superNames = [
+  "Schach", "Skat", "Rommé",
+  "Jackpot", "Domino", "Combo",
+  "Bonus", "Axiom", "Orbit"
+];
+
+for(let i=0;i<9;i++){
+    const btn = document.createElement("button");
+    btn.textContent = superNames[i];
+    btn.style.background = "#0b1220";
+    btn.style.color = "#7dd3fc";
+    btn.style.border = "1px solid #1f2937";
+    btn.style.padding = "12px 18px";
+    btn.style.cursor = "pointer";
+    btn.style.borderRadius = "8px";
+    btn.style.transition = ".2s";
+
+    btn.onclick = () => triggerSuper(i);
+
+    superPanel.appendChild(btn);
+    superButtons.push(btn);
+}
+function triggerSuper(i){
+    const r = Math.floor(Math.random()*4);
+
+    if(r === 0) superChess(i);
+    if(r === 1) superSkat(i);
+    if(r === 2) superRome(i);
+    if(r === 3) superJackpot(i);
+}
+function superChess(i){
+    const axis = Math.floor(Math.random()*27);
+
+    // 6D‑Move: Achse + Orbit
+    axisMoveGood(axis);
+
+    // Figur auswählen
+    const pieces = ["König","Dame","Turm","Springer","Läufer"];
+    const piece = pieces[Math.floor(Math.random()*pieces.length)];
+
+    superButtons[i].textContent = "Schach: " + piece;
+
+    score += 4;
+    updateScore();
+}
+function superSkat(i){
+    const cards = ["♥","♦","♣","♠"];
+    const card = cards[Math.floor(Math.random()*cards.length)];
+
+    superButtons[i].textContent = "Skat: " + card;
+
+    score += 3;
+    updateScore();
+}
+function superRome(i){
+    const num = Math.floor(Math.random()*13)+1;
+    const col = ["red","blue","green"][Math.floor(Math.random()*3)];
+
+    superButtons[i].style.background = col;
+    superButtons[i].textContent = "Rommé: " + num;
+
+    score += 2;
+    updateScore();
+}
+function superJackpot(i){
+    const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+    const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+
+    superButtons[i].textContent = "Jackpot: " + sym;
+
+    const hits = Math.floor(Math.random()*10)+1;
+
+    for(let h=0; h<hits; h++){
+        const cellIndex = Math.floor(Math.random()*756);
+        cells[cellIndex].style.background = "#ffaa00";
+        cells[cellIndex].style.transform = "scale(1.2)";
+    }
+
+    score += hits * 5;
+    updateScore();
+}
+<div id="jackpot-slot" style="
+  position:fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  color:#ffaa00;
+  font-size:26px;
+  z-index:99999;
+">
+Jackpot: —
+</div>
+function updateJackpot(sym){
+    document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
+}
+updateJackpot(sym);
+
+
+  
 for(let i=0;i<9;i++){
     const btn = document.createElement("button");
     btn.textContent = gameNames[i];
