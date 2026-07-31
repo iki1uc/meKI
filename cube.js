@@ -169,3 +169,15 @@ function askToAdopt(index) {
     if (confirm(msg)) console.log("Übernommen:", names[index]);
     else console.log("Nicht übernommen.");
 }
+const sequence = [
+    () => { return SET.activate(); },   // Schritt 0
+    () => { hbt.setAxis("H"); link.sync(); return cibik.orbitIX(); },
+    () => { hbt.setAxis("B"); link.sync(); return cibik.orbitXI(); },
+    () => { hbt.setAxis("T"); link.sync(); return cibik.orbitX4(); },
+    () => { return cibik.orbitAll(); },
+    () => { if (hbt.axis === "T") return cibik.runTask(0); return false; },
+    () => { hbt.rotate(); link.sync(); return true; },
+    () => { return cibik.runTask(1); },
+    () => { return cibik.runTask(2); },
+    () => { return cibik.runTask(3); }
+];
