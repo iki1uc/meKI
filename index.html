@@ -112,6 +112,62 @@ a { color:#6cf; text-decoration:none; font-weight:bold; }
 <script src="../HH/cr/AXI.core.js"></script>
 <script src="../HH/cr/TEM.core.js"></script>
 <script src="../HH/cr/RUN8.core.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+
+    // 1) Profile81 NICHT überschreiben lassen
+    const body = document.body;
+    const loaderText = body.innerHTML;
+
+    // 2) Buttons dynamisch anhängen
+    const btnBlock = document.createElement("div");
+    btnBlock.id = "iki-buttons";
+    btnBlock.style.padding = "20px";
+    btnBlock.style.border = "1px solid #333";
+    btnBlock.style.marginTop = "20px";
+
+    btnBlock.innerHTML = `
+        <div class="title">Übernatürliche Schalter</div>
+
+        <button onclick="SET.activate()" style="background:#222;color:#0f0;border:2px solid #6cf;padding:12px;">
+            SET‑AXIOM · SAAT · START
+        </button>
+
+        <button onclick="axiomSequencer()" style="background:#660;color:#fff;border:3px solid #0f0;padding:14px;">
+            COMPLETUM‑SEQUENCER · SET → ER
+        </button>
+
+        <button onclick="hbt.setAxis('H'); link.sync(); cibik.orbitIX();" style="background:#111;color:#0f0;border:2px solid #6cf;padding:10px;">
+            H‑AXIOM · IX‑PORTAL
+        </button>
+
+        <button onclick="hbt.setAxis('B'); link.sync(); cibik.orbitXI();" style="background:#111;color:#0f0;border:2px solid #6cf;padding:10px;">
+            B‑AXIOM · XI‑PORTAL
+        </button>
+
+        <button onclick="hbt.setAxis('T'); link.sync(); cibik.orbitX4();" style="background:#111;color:#0f0;border:2px solid #6cf;padding:10px;">
+            T‑AXIOM · X4‑PORTAL
+        </button>
+
+        <button onclick="cibik.orbitAll()" style="background:#222;color:#6cf;border:3px solid #0f0;padding:12px;">
+            6e‑FUSION · ALLE ORBITS
+        </button>
+
+        <button onclick="if(hbt.axis==='T'){cibik.runTask(0);}else{console.log('UPG nur im T‑Modus');}"
+                style="background:#330;color:#ff0;border:2px solid #f80;padding:10px;">
+            UPG‑SHIFT · DREIECKS‑ROTATION
+        </button>
+
+        <button onclick="hbt.rotate(); link.sync();" style="background:#000;color:#fff;border:2px dashed #6cf;padding:10px;">
+            CONTINUUM‑SHIFT · H → B → T
+        </button>
+    `;
+
+    // 3) Buttons anhängen
+    body.appendChild(btnBlock);
+
+});
+</script>
 
 <!-- ID MODULES -->
 <script src="IDkoop.js"></script>
