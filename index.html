@@ -1,6 +1,6 @@
 import { addCombo, executeCombo } from "./combo.js";
-import { updateScore } from "./score.js";
-import { nextGate } from "./gates.js";
+import { applyColorRules } from "./score.js";
+import { nextGate, orbitGate } from "./gates.js";
 import { techPulse } from "./tech.js";
 import { RealityPulse } from "./realitypulse.js";
 import { MIACORE } from "./mia-core.js";
@@ -15,40 +15,37 @@ let gate = "GA";
 let currentRoom = rooms.GA;
 
 // Untere Buttons → keine Kosten
-function onLowerButton(action){
+export function onLowerButton(action){
     addCombo(action);
 }
 
-// Ausführende Instanz → alles zusammen = 1 Zug
-function onExecute(){
+// Ausführende Instanz → alles zusammen = EIN Zug
+export function onExecute(){
+
     turns++;
 
+    // 1. Combo ausführen
     const comboResult = executeCombo();
 
-    // Farben-Regeln
-    comboResult.forEach(c => {
-        if(c.color === "yellow") turns--;
-        if(c.color === "green") score += 6;
-        if(c.color === "red") score = Math.floor(score * 0.5);
-    });
+    // 2. Farben-Regeln anwenden
+    score = applyColorRules(comboResult, score, turns);
 
-    // 3-RESPO-GATEN
+    // 3. 3-RESPO-GATEN
     gate = nextGate(gate);
 
-    // ALLXALL-Orbit
-    const orbit = ["GA","meKI","MIE","GA","MIE"];
-    gate = orbit[(turns % orbit.length)];
+    // 4. ALLXALL-Orbit
+    gate = orbitGate(turns);
 
-    // 756-Achsen Tech
+    // 5. 756-Achsen Tech
     const tech = techPulse(tick);
 
-    // WLOCH-Pulse
+    // 6. WLOCH-Pulse
     const pulse = stabiliseRoom(currentRoom);
 
-    // RealityPulse
+    // 7. RealityPulse
     const reality = RealityPulse(currentRoom, tick);
 
-    // MIA-CORE + MIA-TRIBUNAL
+    // 8. MIA-CORE + MIA-TRIBUNAL
     const verdict = MIATribunal({
         pulse,
         tech,
@@ -60,11 +57,12 @@ function onExecute(){
 
     console.log("GAME-VERDICT:", verdict);
 
-    // ECO-3D Shift-Indexer
+    // 9. ECO-3D Shift-Indexer
     ecoShift(reality);
 
     tick++;
 
+    // 10. Spielende nach 13 Zügen
     if(turns >= 13){
         endGame(verdict);
     }
