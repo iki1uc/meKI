@@ -1,91 +1,9 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<div id="final-screen">
-  <div class="opta-box">
-    <div class="opta-inner"></div>
-  </div>
-
-  <div class="final-text">
-    MEKIMAGIC<br>
-    Danke fürs Spielen · Das Kontinuum schließt sich.
-  </div>
-
-  <button onclick="resetGame()" style="
-    margin-top:30px;
-    background:#ffaa00;
-    color:#000;
-    padding:12px 20px;
-    border:none;
-    border-radius:6px;
-    font-weight:bold;
-    cursor:pointer;
-  ">NEUSTART</button>
-</div>
-
-  
-  
-  <meta charset="utf-8">
+<meta charset="utf-8">
 <title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
-/* ⭐ FINAL SCREEN OPTA-ENGINE */
-#final-screen {
-  position:fixed;
-  top:0; left:0; right:0; bottom:0;
-  background:#000;
-  color:#7dd3fc;
-  font-family:monospace;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  text-align:center;
-  z-index:999999;
-  padding:20px;
-  font-size:22px;
-  overflow:hidden;
-}
-
-.opta-box {
-  width:220px;
-  height:220px;
-  border:4px solid #7dd3fc;
-  border-radius:12px;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  animation:opta-rotate 6s infinite linear;
-}
-
-@keyframes opta-rotate {
-  0%   { transform:rotate(0deg) scale(1); }
-  25%  { transform:rotate(90deg) scale(1.1); }
-  50%  { transform:rotate(180deg) scale(1); }
-  75%  { transform:rotate(270deg) scale(1.1); }
-  100% { transform:rotate(360deg) scale(1); }
-}
-
-.opta-inner {
-  width:140px;
-  height:140px;
-  border:3px solid #ffaa00;
-  border-radius:12px;
-  animation:opta-kink 3s infinite ease-in-out;
-}
-
-@keyframes opta-kink {
-  0%   { transform:translateY(0px) rotate(0deg); }
-  25%  { transform:translateY(-20px) rotate(10deg); }
-  50%  { transform:translateY(0px) rotate(0deg); }
-  75%  { transform:translateY(20px) rotate(-10deg); }
-  100% { transform:translateY(0px) rotate(0deg); }
-}
-
-.final-text {
-  margin-top:30px;
-  font-size:26px;
-  text-shadow:0 0 10px #ffaa00;
-}
 
 <style>
   body {
@@ -96,18 +14,15 @@
     overflow:hidden;
   }
 
-  /* ⭐ ALLXALL SCORE */
   #score {
     position:fixed;
     top:0;
     left:50%;
     transform:translateX(-50%);
     color:#7dd3fc;
-    font-size:32px;
+    font-size:20px;
     padding:10px;
     z-index:99999;
-    text-shadow:0 0 10px #00eaff, 0 0 20px #00eaff;
-    transition:transform .2s ease, color .2s ease;
   }
 
   #grid {
@@ -175,6 +90,7 @@
     transition:.2s;
   }
 
+  /* FINAL SCREEN */
   #final-screen {
     position:fixed;
     top:0; left:0; right:0; bottom:0;
@@ -190,212 +106,27 @@
     padding:20px;
     font-size:22px;
   }
-
-  /* ⭐ START-SCREEN */
-  #start-screen {
-    position:fixed; top:0; left:0; right:0; bottom:0;
-    background:#000; color:#7dd3fc; font-family:monospace;
-    display:flex; flex-direction:column; justify-content:center;
-    align-items:center; text-align:center; z-index:999999;
-    padding:20px; font-size:22px;
-  }
 </style>
 </head>
 
 <body>
 
-<!-- ⭐ SCORE -->
 <div id="score">Score: 0</div>
-
-<!-- ⭐ PANELS -->
 <div id="axis-panel"></div>
 <div id="super-panel"></div>
 <div id="jackpot-slot">Jackpot: —</div>
 
-<!-- ⭐ GRID -->
 <div id="grid"></div>
-
-<!-- ⭐ FINAL SCREEN -->
 <div id="final-screen"></div>
 
-<!-- ⭐ START SCREEN -->
-<div id="start-screen">
-  <div style="font-size:40px; margin-bottom:20px;">meKI · ALLXALL</div>
-
-  <button id="mode-score" style="margin:10px; padding:12px 20px;">Spiel‑Score‑Modus</button>
-  <button id="mode-info" style="margin:10px; padding:12px 20px;">Spiel‑Erklär‑Modus</button>
-  <button id="mode-contact" style="margin:10px; padding:12px 20px;">Spiel‑Kontakt‑Modus</button>
-
-  <div id="discord-box" style="margin-top:40px; font-size:18px; opacity:0.8;">
-    <div>──────────────</div>
-    <div id="discord-line">Discord: @iki1uc</div>
-    <div>──────────────</div>
-  </div>
-</div>
-
 <script>
-/* ⭐ GRID SYMBOLS */
+/* GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
   "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
 ];
-
-/* ⭐ SCORE SYSTEM */
-let score = 0;
-let displayScore = 0;
-
-function updateScore(amount = 1){
-  score += amount;
-
-  const scoreEl = document.getElementById("score");
-
-  scoreEl.style.transform = "scale(1.3)";
-  scoreEl.style.color = "#00eaff";
-
-  setTimeout(()=>{
-    scoreEl.style.transform = "scale(1)";
-    scoreEl.style.color = "#7dd3fc";
-  }, 150);
-
-  const step = () => {
-    if(displayScore < score){
-      displayScore++;
-      scoreEl.textContent = "Score: " + displayScore;
-      requestAnimationFrame(step);
-    }
-  };
-  step();
-}
-/* ⭐ AIR / AIV KALKÜL-ENGINE */
-let airScore = 0;       // misst Interaktion
-let airFlow = 1;        // reguliert Geschwindigkeit
-let airTrust = 1;       // misst Stabilität
-let airTrigger = 0;     // löst Ereignisse aus
-
-setInterval(()=>{
-
-  // Spieleraktivität messen
-  airScore += metaBoost;        // META-Boost integriert
-  airFlow = Math.min(5, airFlow + 0.1);
-  airTrust = Math.min(10, airTrust + 0.05);
-
-  // Pädagogische Ableitung
-  if(airScore > 50 && airFlow > 2){
-    airTrigger = 1; // Spieler aktiv → Belohnung
-  }
-
-  if(airScore > 120 && airTrust > 5){
-    airTrigger = 2; // Spieler stabil → Jackpot
-  }
-
-  if(airScore > 200){
-    airTrigger = 3; // Spieler engagiert → Final
-  }
-
-  // Trigger ausführen
-  if(airTrigger === 1){
-    updateScore(10);
-    airTrigger = 0;
-  }
-
-  if(airTrigger === 2){
-    superJackpot(3);
-    airTrigger = 0;
-  }
-
-  if(airTrigger === 3){
-    showFinalScreen();
-    airTrigger = 0;
-  }
-
-}, 1000);
-
-/* ⭐ GRID BUILD */
-const grid = document.getElementById("grid");
-const cells = [];
-
-for(let i=0;i<756;i++){
-  const cell = document.createElement("div");
-  cell.className = "cell";
-  cell.textContent = symbols[i % symbols.length];
-
-  cell.onclick = () => {
-    const deg = Math.floor(Math.random()*360);
-    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
-
-    cell.style.transform = "rotate(" + deg + "deg)";
-    cell.style.background = col;
-
-    updateScore();
-  };
-
-  grid.appendChild(cell);
-  cells.push(cell);
-}
-
-/* ⭐ AXIS PANEL */
-const axisPanel = document.getElementById("axis-panel");
-
-for(let a=0; a<27; a++){
-  const btn = document.createElement("button");
-  btn.textContent = "A" + (a+1);
-
-  btn.onclick = () => updateScore(3);
-
-  axisPanel.appendChild(btn);
-}
-
-/* ⭐ SUPER PANEL */
-const superPanel = document.getElementById("super-panel");
-const superNames = [
-  "Schach","Skat","Rommé",
-  "Jackpot","Domino","Combo",
-  "Bonus","Axiom","Orbit"
-];
-
-for(let i=0;i<9;i++){
-  const btn = document.createElement("button");
-  btn.textContent = superNames[i];
-
-  btn.onclick = () => triggerSuper(i);
-function showFinalScreen(){
-  document.getElementById("final-screen").style.display = "flex";
-}
-showFinalScreen();
-
-  superPanel.appendChild(btn);
-}
-
-/* ⭐ SUPER FUNCTIONS */
-function triggerSuper(i){
-  if(i === 3){
-    superJackpot(i);
-  } else {
-    updateScore(5);
-  }
-}
-
-/* ⭐ JACKPOT FX */
-function superJackpot(i){
-  superPanel.children[i].textContent = "Jackpot!";
-
-for(let h=0; h<10; h++){
-  const cellIndex = Math.floor(Math.random()*756);
-
-  const colors = ["#ffaa00", "#ff4444", "#33ff33"]; // Gelb, Rot, Grün
-  const pickColor = colors[Math.floor(Math.random()*colors.length)];
-
-  cells[cellIndex].style.background = pickColor;
-  cells[cellIndex].style.transform = "scale(1.2)";
-}
-
-  }
-
-  updateScore(50);
-  triggerJackpotFX();
-}
 
 /* ⭐ NOVOLINO – Euphorische Adaptive Sound Engine */
 const novolinoPool = {
@@ -442,68 +173,222 @@ setInterval(()=>{
 
 }, 4000); // alle 4 Sekunden ein sanfter Euphorie‑Impuls
 
-
-/* ⭐ START-SCREEN LOGIK */
-document.getElementById("mode-score").onclick = () => startGame("SCORE");
-document.getElementById("mode-info").onclick = () => startGame("INFO");
-document.getElementById("mode-contact").onclick = () => startGame("CONTACT");
-
-function startGame(mode){
-  window.currentMode = mode;
-
-  AIR_AIV_Stabilize();
-
-  document.getElementById("start-screen").style.display = "none";
-
-  if(mode === "INFO"){
-    alert("Erklär-Modus aktiviert.\nDas Spiel zeigt dir Hinweise und Tipps.");
-  }
-  if(mode === "CONTACT"){
-    alert("Kontakt-Modus aktiviert.\nDiscord-Adresse sichtbar.");
-  }
+  
+/* SCORE */
+let score = 0;
+function updateScore(){
+  score++;
+  document.getElementById("score").textContent = "Score: " + score;
 }
 
-/* ⭐ AIR / AIV / XI / IX / X4 Stabilisierung */
-function AIR_AIV_Stabilize(){
-  window.onerror = function(){
-    console.log("AIR: Fehler abgefangen — Spiel bleibt stabil.");
-    return true;
+/* GRID */
+const grid = document.getElementById("grid");
+const cells = [];
+
+for(let i=0;i<756;i++){
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.textContent = symbols[i % symbols.length];
+
+  cell.onclick = () => {
+    const deg = Math.floor(Math.random()*360);
+    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
+
+    cell.style.transform = "rotate(" + deg + "deg)";
+    cell.style.background = col;
+
+    if(i % 2 === 0){
+      cell.style.border = "2px solid #66ffaa";
+    } else {
+      cell.style.border = "2px solid #ffaa66";
+    }
+
+    updateScore();
   };
 
-  window.addEventListener("unhandledrejection", ()=>{
-    console.log("AIV: Promise-Fehler abgefangen.");
-  });
+  grid.appendChild(cell);
+  cells.push(cell);
 }
 
-/* ⭐ NEUSTART-TASTE */
-const restartBtn = document.createElement("button");
-restartBtn.textContent = "NEUSTART";
-restartBtn.style.cssText = `
-  position:fixed; top:10px; right:10px;
-  background:#ffaa00; color:#000; padding:10px 20px;
-  border:none; border-radius:6px; z-index:999999;
-  cursor:pointer; font-weight:bold;
-`;
-restartBtn.onclick = resetGame;
+/* AXIS PANEL */
+const axisPanel = document.getElementById("axis-panel");
 
-document.body.appendChild(restartBtn);
+for(let a=0; a<27; a++){
+  const btn = document.createElement("button");
+  btn.textContent = "A" + (a+1);
 
-/* ⭐ RESET */
-function resetGame(){
-  score = 0;
-  displayScore = 0;
-  document.getElementById("score").textContent = "Score: 0";
+  btn.onclick = () => triggerAxis(a, btn);
 
-  cells.forEach(c=>{
-    c.style.background = "#000";
-    c.style.transform = "scale(1)";
-  });
-
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
-
-  document.getElementById("start-screen").style.display = "flex";
+  axisPanel.appendChild(btn);
 }
 
+function triggerAxis(axis, btn){
+  const quality = Math.floor(Math.random()*3);
+
+  if(quality === 0){
+    btn.style.background = "yellow";
+    axisMoveNeutral(axis);
+  }
+  if(quality === 1){
+    btn.style.background = "green";
+    axisMoveGood(axis);
+  }
+  if(quality === 2){
+    btn.style.background = "red";
+    axisMoveBad(axis);
+  }
+}
+
+function axisMoveNeutral(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#333";
+  }
+}
+
+function axisMoveGood(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#00aa00";
+    cells[i].style.transform = "scale(1.1)";
+  }
+
+  updateScore();
+}
+
+function axisMoveBad(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#aa0000";
+    cells[i].style.transform = "rotate(10deg)";
+  }
+}
+
+/* SUPER PANEL */
+const superPanel = document.getElementById("super-panel");
+const superNames = [
+  "Schach","Skat","Rommé",
+  "Jackpot","Domino","Combo",
+  "Bonus","Axiom","Orbit"
+];
+
+for(let i=0;i<9;i++){
+  const btn = document.createElement("button");
+  btn.textContent = superNames[i];
+
+  btn.onclick = () => triggerSuper(i);
+
+  superPanel.appendChild(btn);
+}
+
+function triggerSuper(i){
+  const r = Math.floor(Math.random()*4);
+
+  if(r === 0) superChess(i);
+  if(r === 1) superSkat(i);
+  if(r === 2) superRome(i);
+  if(r === 3) superJackpot(i);
+}
+
+function superChess(i){
+  const axis = Math.floor(Math.random()*27);
+  axisMoveGood(axis);
+
+  const pieces = ["König","Dame","Turm","Springer","Läufer"];
+  const piece = pieces[Math.floor(Math.random()*pieces.length)];
+
+  superPanel.children[i].textContent = "Schach: " + piece;
+
+  score += 4;
+  updateScore();
+}
+
+function superSkat(i){
+  const cards = ["♥","♦","♣","♠"];
+  const card = cards[Math.floor(Math.random()*cards.length)];
+
+  superPanel.children[i].textContent = "Skat: " + card;
+
+  score += 3;
+  updateScore();
+}
+
+function superRome(i){
+  const num = Math.floor(Math.random()*13)+1;
+  const col = ["red","blue","green"][Math.floor(Math.random()*3)];
+
+  superPanel.children[i].style.background = col;
+  superPanel.children[i].textContent = "Rommé: " + num;
+
+  score += 2;
+  updateScore();
+}
+
+function superJackpot(i){
+  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+
+  superPanel.children[i].textContent = "Jackpot: " + sym;
+
+  const hits = Math.floor(Math.random()*10)+1;
+
+  for(let h=0; h<hits; h++){
+    const cellIndex = Math.floor(Math.random()*756);
+    cells[cellIndex].style.background = "#ffaa00";
+    cells[cellIndex].style.transform = "scale(1.2)";
+  }
+
+  score += hits * 5;
+  updateScore();
+
+  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
+}
+
+/* FINAL‑SCREEN */
+function FINAL(title, text){
+  const FS = document.getElementById("final-screen");
+  FS.innerHTML = `
+    <div style="font-size:40px; margin-bottom:20px;">${title}</div>
+    <div style="margin-bottom:40px;">${text}</div>
+    <div id="cube" style="width:120px; height:120px; border:3px solid #7dd3fc;"></div>
+  `;
+  FS.style.display = "flex";
+  CUBE_ANIM();
+}
+
+/* 3D‑Zauberwürfel‑Animation */
+function CUBE_ANIM(){
+  let deg = 0;
+  const cube = document.getElementById("cube");
+  setInterval(()=>{
+    deg += 3;
+    cube.style.transform = `rotateY(${deg}deg) rotateX(${deg/2}deg)`;
+  }, 30);
+}
+
+/* OUTRO MIT 9 BUCHSTABEN */
+function OUTRO(){
+  FINAL("MEKIMAGIC", "Danke fürs Spielen · Das Kontinuum schließt sich.");
+}
+
+/* FINALE TRIGGER — 13 Sekunden */
+setTimeout(()=>{
+
+  const r = Math.floor(Math.random()*5);
+
+  if(r === 0) FINAL("GA · meKI · MIE", "Axiomisches Dreieck abgeschlossen.");
+  if(r === 1) FINAL("756‑Achsen‑Finale", "Magic‑Grid vollständig durchlaufen.");
+  if(r === 2) FINAL("2268‑Würfel‑Finale", "ALLXALL‑Kontinuum stabilisiert.");
+  if(r === 3) FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
+  if(r === 4) OUTRO();
+
+}, 13000);
 </script>
 
 </body>
