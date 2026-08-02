@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · Kernel‑Respo · Visual‑System</title>
+<title>meKI · 756 NC‑Magic Grid · GRANDIOS</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -11,168 +11,293 @@
     color:#7dd3fc;
     font-family:monospace;
     margin:0;
-    padding:0;
     overflow:hidden;
   }
 
-  header {
-    text-align:center;
-    padding:20px 0;
-    font-size:32px;
+  #score {
+    position:fixed;
+    top:0;
+    left:50%;
+    transform:translateX(-50%);
     color:#00eaff;
-    text-shadow:0 0 12px #00eaff;
-    border-bottom:1px solid #0a1a2a;
-  }
-
-  #layout {
-    display:flex;
-    height:calc(100vh - 100px);
-  }
-
-  #left {
-    width:28%;
-    border-right:1px solid #0a1a2a;
-    padding:20px;
-    overflow-y:auto;
-  }
-
-  #right {
-    width:72%;
-    padding:20px;
-    overflow:hidden;
-  }
-
-  .module {
-    border:1px solid #0a1a2a;
+    font-size:22px;
     padding:10px;
-    margin-bottom:10px;
-    background:#0b1220;
-    border-radius:6px;
+    z-index:99999;
+    text-shadow:0 0 12px #00eaff;
   }
 
-  #run {
-    margin-top:20px;
-    padding:12px 20px;
+  #grid {
+    position:fixed;
+    top:60px; left:0; right:0; bottom:0;
+    display:grid;
+    grid-template-columns:repeat(27, 1fr);
+    grid-template-rows:repeat(28, 1fr);
+    gap:3px;
+    padding:10px;
+    overflow:auto; /* ⭐ WICHTIG – sonst zeigt Browser nur Text */
+  }
+
+  .cell {
+    border:1px solid #1f2937;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:18px;
+    transition:transform .25s ease, background .25s ease, box-shadow .25s ease;
+    cursor:pointer;
+  }
+
+  .cell:hover {
+    box-shadow:0 0 12px #00eaff;
+  }
+
+  #axis-panel {
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    height:60px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+    background:#000;
+    border-top:2px solid #00eaff;
+    z-index:99999;
+  }
+
+  #super-panel {
+    position:fixed;
+    bottom:70px;
+    left:50%;
+    transform:translateX(-50%);
+    display:flex;
+    gap:12px;
+    z-index:99999;
+  }
+
+  #jackpot-slot {
+    position:fixed;
+    bottom:20px;
+    left:50%;
+    transform:translateX(-50%);
+    color:#ffaa00;
+    font-size:28px;
+    text-shadow:0 0 12px #ffaa00;
+    z-index:99999;
+  }
+
+  button {
+    background:#0b1220;
+    color:#00eaff;
+    border:1px solid #1f2937;
+    padding:10px 14px;
+    cursor:pointer;
+    border-radius:6px;
+    transition:.2s;
+  }
+
+  button:hover {
     background:#00eaff;
     color:#000;
-    border:none;
-    border-radius:6px;
-    cursor:pointer;
-    font-weight:bold;
-    font-size:16px;
-  }
-
-  #visual {
-    width:100%;
-    height:100%;
-    background:#0b1220;
-    border:1px solid #0a1a2a;
-    border-radius:6px;
-    overflow:hidden;
-    position:relative;
-  }
-
-  canvas {
-    width:100%;
-    height:100%;
+    box-shadow:0 0 12px #00eaff;
   }
 </style>
 </head>
 
 <body>
 
-<header>meKI · Kernel‑Respo · CORE‑Module</header>
+<div id="score">Score: 0</div>
+<div id="axis-panel"></div>
+<div id="super-panel"></div>
+<div id="jackpot-slot">Jackpot: —</div>
 
-<div id="layout">
+<div id="grid"></div>
 
-  <!-- LEFT SIDE -->
-  <div id="left">
-    <h2>Module</h2>
+<script>
+/* ⭐ GRID SYMBOLS */
+const symbols = [
+  "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
+  "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
+  "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
+  "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
+];
 
-    <div class="module">RUN</div>
-    <div class="module">game.js</div>
-    <div class="module">score.js</div>
-    <div class="module">SET.js</div>
-    <div class="module">SETI.js</div>
-    <div class="module">SET‑Pulse.js</div>
-    <div class="module">SETI‑Reality.js</div>
-    <div class="module">cube.js</div>
-    <div class="module">team-kernel.js</div>
-    <div class="module">visualizer.js</div>
-    <div class="module">meKI.js</div>
-    <div class="module">eco-shift.js</div>
-    <div class="module">combo.js</div>
-    <div class="module">tribunal.js</div>
-    <div class="module">mia-core.js</div>
-    <div class="module">mia-tribunal.js</div>
-    <div class="module">wloch.js</div>
+/* ⭐ SCORE */
+let score = 0;
+function updateScore(v=1){
+  score += v;
+  document.getElementById("score").textContent = "Score: " + score;
+}
 
-    <button id="run">System starten</button>
-  </div>
+/* ⭐ GRID */
+const grid = document.getElementById("grid");
+const cells = [];
 
-  <!-- RIGHT SIDE -->
-  <div id="right">
-    <h2>System‑Visualisierung</h2>
-    <div id="visual">
-      <canvas id="canvas"></canvas>
-    </div>
-  </div>
+for(let i=0;i<756;i++){
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.textContent = symbols[i % symbols.length];
 
-</div>
+  cell.onclick = () => {
+    const deg = Math.floor(Math.random()*360);
+    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
 
-<script type="module">
+    cell.style.transform = "rotate(" + deg + "deg) scale(1.2)";
+    cell.style.background = col;
+    cell.style.boxShadow = "0 0 12px " + col;
 
-import { meKI } from "./meKI.js";
-import { TeamKernel } from "./team-kernel.js";
-import { visualize2268 } from "./visualizer.js";
-import { SET } from "./SET.js";
-import { SETI } from "./SETI.js";
-import { Pulse } from "./SET-Pulse.js";
-import { Reality } from "./SETI-Reality.js";
-import { scoreSystem } from "./score.js";
-import { gates } from "./gates.js";
-import { game } from "./game.js";
-import { ecoShift } from "./eco-shift.js";
-import { combo } from "./combo.js";
-import { cube } from "./cube.js";
-import { realityPulse } from "./realitypulse.js";
-import { tech } from "./tech.js";
-import { tribunal } from "./tribunal.js";
-import { miaCore } from "./mia-core.js";
-import { miaTribunal } from "./mia-tribunal.js";
-import { wloch } from "./wloch.js";
+    setTimeout(()=>cell.style.transform="scale(1)",200);
 
-document.getElementById("run").onclick = () => {
-
-  const system = {
-    meKI: meKI(),
-    team: TeamKernel(),
-    cube: cube(),
-    gates: gates(),
-    game: game(),
-    score: scoreSystem(),
-    eco: ecoShift(),
-    combo: combo(),
-    pulse: Pulse(),
-    reality: Reality(),
-    realityPulse: realityPulse(),
-    tech: tech(),
-    tribunal: tribunal(),
-    miaCore: miaCore(),
-    miaTribunal: miaTribunal(),
-    wloch: wloch()
+    updateScore();
   };
 
-  // VISUALIZER
-  const canvas = document.getElementById("canvas");
-  const ctx = canvas.getContext("2d");
+  grid.appendChild(cell);
+  cells.push(cell);
+}
 
-  canvas.width = canvas.offsetWidth;
-  canvas.height = canvas.offsetHeight;
+/* ⭐ AXIS PANEL */
+const axisPanel = document.getElementById("axis-panel");
 
-  ctx.fillStyle = "#00111a";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
+for(let a=0; a<27; a++){
+  const btn = document.createElement("button");
+  btn.textContent = "A" + (a+1);
 
-  // simple visual: kernel pulses
-  let x = 0;
-  const
+  btn.onclick = () => triggerAxis(a, btn);
+
+  axisPanel.appendChild(btn);
+}
+
+function triggerAxis(axis, btn){
+  const quality = Math.floor(Math.random()*3);
+
+  if(quality === 0){
+    btn.style.background = "yellow";
+    axisMoveNeutral(axis);
+  }
+  if(quality === 1){
+    btn.style.background = "green";
+    axisMoveGood(axis);
+  }
+  if(quality === 2){
+    btn.style.background = "red";
+    axisMoveBad(axis);
+  }
+}
+
+function axisMoveNeutral(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#333";
+    cells[i].style.boxShadow = "none";
+  }
+}
+
+function axisMoveGood(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#00aa00";
+    cells[i].style.transform = "scale(1.2)";
+    cells[i].style.boxShadow = "0 0 12px #00ff00";
+  }
+
+  updateScore(5);
+}
+
+function axisMoveBad(axis){
+  const start = axis * 28;
+  const end = start + 28;
+
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#aa0000";
+    cells[i].style.transform = "rotate(10deg)";
+    cells[i].style.boxShadow = "0 0 12px #ff0000";
+  }
+
+  updateScore(3);
+}
+
+/* ⭐ SUPER PANEL */
+const superPanel = document.getElementById("super-panel");
+const superNames = [
+  "Schach","Skat","Rommé",
+  "Jackpot","Domino","Combo",
+  "Bonus","Axiom","Orbit"
+];
+
+for(let i=0;i<9;i++){
+  const btn = document.createElement("button");
+  btn.textContent = superNames[i];
+
+  btn.onclick = () => triggerSuper(i);
+
+  superPanel.appendChild(btn);
+}
+
+function triggerSuper(i){
+  const r = Math.floor(Math.random()*4);
+
+  if(r === 0) superChess(i);
+  if(r === 1) superSkat(i);
+  if(r === 2) superRome(i);
+  if(r === 3) superJackpot(i);
+}
+
+function superChess(i){
+  const axis = Math.floor(Math.random()*27);
+  axisMoveGood(axis);
+
+  const pieces = ["König","Dame","Turm","Springer","Läufer"];
+  const piece = pieces[Math.floor(Math.random()*pieces.length)];
+
+  superPanel.children[i].textContent = "Schach: " + piece;
+
+  updateScore(10);
+}
+
+function superSkat(i){
+  const cards = ["♥","♦","♣","♠"];
+  const card = cards[Math.floor(Math.random()*cards.length)];
+
+  superPanel.children[i].textContent = "Skat: " + card;
+
+  updateScore(8);
+}
+
+function superRome(i){
+  const num = Math.floor(Math.random()*13)+1;
+  const col = ["red","blue","green"][Math.floor(Math.random()*3)];
+
+  superPanel.children[i].style.background = col;
+  superPanel.children[i].textContent = "Rommé: " + num;
+
+  updateScore(6);
+}
+
+function superJackpot(i){
+  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+
+  superPanel.children[i].textContent = "Jackpot: " + sym;
+
+  const hits = Math.floor(Math.random()*20)+5;
+
+  for(let h=0; h<hits; h++){
+    const cellIndex = Math.floor(Math.random()*756);
+    cells[cellIndex].style.background = "#ffaa00";
+    cells[cellIndex].style.transform = "scale(1.3)";
+    cells[cellIndex].style.boxShadow = "0 0 12px #ffaa00";
+  }
+
+  updateScore(hits * 3);
+
+  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
+}
+</script>
+
+</body>
+</html>
