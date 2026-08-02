@@ -3,21 +3,26 @@ import { applyColorRules } from "./score.js";
 import { nextGate, orbitGate } from "./gates.js";
 import { techPulse } from "./tech.js";
 import { RealityPulse } from "./realitypulse.js";
-import { MIACORE } from "./mia-core.js";
 import { MIATribunal } from "./mia-tribunal.js";
 import { stabiliseRoom } from "./wloch.js";
 import { ecoShift } from "./eco-shift.js";
 import { loadAllRooms } from "./GateRoomLoader.js";
 
+/* TEAM-WORK META */
 let turns = 0;
 let score = 0;
 let tick = 0;
 let gate = "GA";
+let axiomMode = "IN";
+let slide = 0;
+
+/* ROOM POINTER */
 let rooms = {};
 let currentRoom = null;
 
-// WICHTIG: rooms zuerst laden!
-async function initGame(){
+/* INIT: rooms zuerst laden */
+export async function initGame(){
+
     rooms = await loadAllRooms();
 
     // Startpunkt
@@ -26,14 +31,23 @@ async function initGame(){
     console.log("GAME STARTED:", currentRoom);
 }
 
-initGame();
+/* SLIDE-3 AXIOM SYSTEM */
+function slideAxiom(){
+    slide++;
 
-// Untere Buttons → keine Kosten
+    if(slide % 3 === 1) axiomMode = "IN";
+    if(slide % 3 === 2) axiomMode = "OUT";
+    if(slide % 3 === 0) axiomMode = "IO";
+
+    console.log("AXIOM-MODE:", axiomMode);
+}
+
+/* UNTERE BUTTONS → KEINE KOSTEN */
 export function onLowerButton(action){
     addCombo(action);
 }
 
-// Ausführende Instanz → alles zusammen = EIN Zug
+/* AUSFÜHRENDE INSTANZ → ALLES = EIN ZUG */
 export function onExecute(){
 
     if(!currentRoom){
@@ -43,50 +57,55 @@ export function onExecute(){
 
     turns++;
 
-    // 1. Combo ausführen
+    /* 1. Combo ausführen */
     const comboResult = executeCombo();
 
-    // 2. Farben-Regeln anwenden
+    /* 2. Farben-Regeln */
     score = applyColorRules(comboResult, score, turns);
 
-    // 3. 3-RESPO-GATEN
+    /* 3. 3-RESPO-GATEN */
     gate = nextGate(gate);
 
-    // 4. ALLXALL-Orbit
+    /* 4. ALLXALL-Orbit */
     gate = orbitGate(turns);
 
-    // 5. 756-Achsen Tech
+    /* 5. 756-Achsen Tech */
     const tech = techPulse(tick);
 
-    // 6. WLOCH-Pulse
+    /* 6. WLOCH-Pulse */
     const pulse = stabiliseRoom(currentRoom);
 
-    // 7. RealityPulse
+    /* 7. RealityPulse */
     const reality = RealityPulse(currentRoom, tick);
 
-    // 8. MIA-CORE + MIA-TRIBUNAL
+    /* 8. MIA-TRIBUNAL */
     const verdict = MIATribunal({
         pulse,
         tech,
         mode: reality.meta.mode,
         score,
         turns,
-        gate
+        gate,
+        axiomMode,
+        slide
     });
 
     console.log("GAME-VERDICT:", verdict);
 
-    // 9. ECO-3D Shift-Indexer
+    /* 9. ECO-3D SHIFT */
     ecoShift(reality);
 
-    tick++;
-
-    // 10. ROOM ROUTING
+    /* 10. ROOM ROUTING */
     if(pulse.soll === 2) currentRoom = rooms.meKI;
     if(pulse.soll === 3) currentRoom = rooms.MIE;
     if(pulse.soll === 1) currentRoom = rooms.GA;
 
-    // 11. Spielende nach 13 Zügen
+    /* 11. SLIDE-3 AXIOM */
+    slideAxiom();
+
+    tick++;
+
+    /* 12. SPIELENDE */
     if(turns >= 13){
         endGame(verdict);
     }
