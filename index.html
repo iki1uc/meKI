@@ -7,88 +7,86 @@ import { MIACORE } from "./mia-core.js";
 import { MIATribunal } from "./mia-tribunal.js";
 import { stabiliseRoom } from "./wloch.js";
 import { ecoShift } from "./eco-shift.js";
+import { loadAllRooms } from "./GateRoomLoader.js";
 
-/* TEAM-WORK META */
 let turns = 0;
 let score = 0;
 let tick = 0;
-let gate = "GA";          // Start-Gate
-let axiomMode = "IN";     // Start-Axiom
-let slide = 0;
+let gate = "GA";
+let rooms = {};
+let currentRoom = null;
 
-/* ROOM POINTER (GA ↔ meKI ↔ MIE TEAM-WORK) */
-let currentRoom = rooms.GA;
+// WICHTIG: rooms zuerst laden!
+async function initGame(){
+    rooms = await loadAllRooms();
 
-/* SLIDE-3 AXIOM SYSTEM */
-function slideAxiom(){
-    slide++;
+    // Startpunkt
+    currentRoom = rooms.GA;
 
-    if(slide % 3 === 1) axiomMode = "IN";
-    if(slide % 3 === 2) axiomMode = "OUT";
-    if(slide % 3 === 0) axiomMode = "IO";
-
-    console.log("AXIOM-MODE:", axiomMode);
+    console.log("GAME STARTED:", currentRoom);
 }
 
-/* UNTERE BUTTONS → KEINE KOSTEN */
+initGame();
+
+// Untere Buttons → keine Kosten
 export function onLowerButton(action){
     addCombo(action);
 }
 
-/* AUSFÜHRENDE INSTANZ → ALLES = EIN ZUG */
+// Ausführende Instanz → alles zusammen = EIN Zug
 export function onExecute(){
+
+    if(!currentRoom){
+        console.error("Rooms not loaded yet!");
+        return;
+    }
 
     turns++;
 
-    /* 1. Combo ausführen */
+    // 1. Combo ausführen
     const comboResult = executeCombo();
 
-    /* 2. Farben-Regeln */
+    // 2. Farben-Regeln anwenden
     score = applyColorRules(comboResult, score, turns);
 
-    /* 3. 3-RESPO-GATEN */
+    // 3. 3-RESPO-GATEN
     gate = nextGate(gate);
 
-    /* 4. ALLXALL-Orbit */
+    // 4. ALLXALL-Orbit
     gate = orbitGate(turns);
 
-    /* 5. 756-Achsen Tech */
+    // 5. 756-Achsen Tech
     const tech = techPulse(tick);
 
-    /* 6. WLOCH-Pulse */
+    // 6. WLOCH-Pulse
     const pulse = stabiliseRoom(currentRoom);
 
-    /* 7. RealityPulse */
+    // 7. RealityPulse
     const reality = RealityPulse(currentRoom, tick);
 
-    /* 8. MIA-CORE + MIA-TRIBUNAL */
+    // 8. MIA-CORE + MIA-TRIBUNAL
     const verdict = MIATribunal({
         pulse,
         tech,
         mode: reality.meta.mode,
         score,
         turns,
-        gate,
-        axiomMode,
-        slide
+        gate
     });
 
     console.log("GAME-VERDICT:", verdict);
 
-    /* 9. ECO-3D SHIFT */
+    // 9. ECO-3D Shift-Indexer
     ecoShift(reality);
 
-    /* 10. ROOM ROUTING (GA ↔ meKI ↔ MIE TEAM-WORK) */
+    tick++;
+
+    // 10. ROOM ROUTING
     if(pulse.soll === 2) currentRoom = rooms.meKI;
     if(pulse.soll === 3) currentRoom = rooms.MIE;
     if(pulse.soll === 1) currentRoom = rooms.GA;
 
-    /* 11. SLIDE-3 AXIOM */
-    slideAxiom();
-
-    tick++;
-
-    /* 12. SPIELENDE */
+    // 11. Spielende nach 13 Zügen
     if(turns >= 13){
         endGame(verdict);
     }
