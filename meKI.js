@@ -1,4 +1,4 @@
-// meKI.js — erzeugt das axiomische Dreieck GA–meKI–MIE
+// meKI.js — 27→81→756→2268 Würfel-Kalkül
 
 import { techPulse } from "./tech.js";
 import { stabiliseRoom } from "./wloch.js";
@@ -6,31 +6,29 @@ import { RealityPulse } from "./realitypulse.js";
 import { MIATribunal } from "./mia-tribunal.js";
 import { orbitGate } from "./gates.js";
 
-export function meKI(currentRoom, tick, turns, axiomMode, slide){
+export function meKI(room, tick, turns, axiom, slide){
 
+    const pulse = stabiliseRoom(room);
     const tech = techPulse(tick);
-    const pulse = stabiliseRoom(currentRoom);
-    const reality = RealityPulse(currentRoom, tick);
+    const reality = RealityPulse(room, tick);
     const gate = orbitGate(turns);
 
-    const verdict = MIATribunal({
-        pulse,
-        tech,
-        mode: reality.meta.mode,
-        score: reality.meta.tick,
-        turns,
-        gate,
-        axiomMode,
-        slide
-    });
-
     return {
-        pulse,
-        tech,
-        gate,
-        axiomMode,
-        slide,
-        room: currentRoom,
-        verdict
+        pulse,          // 3
+        tech,           // 3
+        axiom,          // 3
+        slide,          // 3
+        gate,           // 3
+        room,           // 3
+        verdict: MIATribunal({
+            pulse,
+            tech,
+            mode: reality.meta.mode,
+            score: reality.meta.tick,
+            turns,
+            gate,
+            axiom,
+            slide
+        })
     };
 }
