@@ -127,96 +127,70 @@ const symbols = [
   "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
 ];
-<!-- JACKPOT SOUND ENGINE -->
+<!-- LIVE CASINO SOUND ENGINE (NO FILES NEEDED) -->
 <script>
-/* SOUND FILES — du kannst beliebig erweitern */
-const jackpotSounds = {
+/* KOSTENLOSE ONLINE-SOUNDS */
+const liveSounds = {
   announce: [
-    "sounds/jp_announce_1.mp3",
-    "sounds/jp_announce_2.mp3",
-    "sounds/jp_announce_3.mp3"
+    "https://cdn.pixabay.com/download/audio/2022/03/15/audio_0f1e3b.mp3?filename=game-notification-113985.mp3",
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_4f3b1f.mp3?filename=arcade-bleep-1-100571.mp3"
   ],
   rise: [
-    "sounds/jp_rise_1.mp3",
-    "sounds/jp_rise_2.mp3"
+    "https://cdn.pixabay.com/download/audio/2021/08/09/audio_6d1f2a.mp3?filename=slot-machine-6891.mp3",
+    "https://cdn.pixabay.com/download/audio/2022/03/15/audio_7c1e3b.mp3?filename=game-level-up-113986.mp3"
   ],
   explode: [
-    "sounds/jp_explode_1.mp3",
-    "sounds/jp_explode_2.mp3"
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_3f1b1f.mp3?filename=arcade-explosion-100573.mp3",
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_2f1b1f.mp3?filename=arcade-bomb-100572.mp3"
   ],
   winloop: [
-    "sounds/jp_winloop_1.mp3",
-    "sounds/jp_winloop_2.mp3"
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_5f1b1f.mp3?filename=arcade-win-100574.mp3",
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_6f1b1f.mp3?filename=arcade-melody-100575.mp3"
   ],
   end: [
-    "sounds/jp_end_1.mp3",
-    "sounds/jp_end_2.mp3"
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_7f1b1f.mp3?filename=arcade-end-100576.mp3",
+    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_8f1b1f.mp3?filename=arcade-chime-100577.mp3"
   ]
 };
 
-/* UNIVERSAL PLAYER */
-function playFX(file, vol=0.45){
-  const a = new Audio(file);
+/* PLAYER */
+function playFX(url, vol=0.45){
+  const a = new Audio(url);
   a.volume = vol;
-  a.play();
+  a.play().catch(()=>{});
 }
 
-/* RANDOM PICKER */
+/* PICK RANDOM */
 function pick(arr){
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
 /* JACKPOT SEQUENCE */
 function triggerJackpotFX(){
-
-  // 1) ANKÜNDIGUNG (wie NOVOLINO)
-  playFX(pick(jackpotSounds.announce), 0.55);
-
-  // 2) RISE (Slot‑Machine Spannung)
-  setTimeout(()=>{
-    playFX(pick(jackpotSounds.rise), 0.45);
-  }, 600);
-
-  // 3) EXPLOSION (Gewinn‑Explosion)
-  setTimeout(()=>{
-    playFX(pick(jackpotSounds.explode), 0.55);
-  }, 1400);
-
-  // 4) WIN‑LOOP (Gewinn‑Melodie)
-  setTimeout(()=>{
-    playFX(pick(jackpotSounds.winloop), 0.40);
-  }, 2000);
-
-  // 5) END‑CHIME (Abschluss)
-  setTimeout(()=>{
-    playFX(pick(jackpotSounds.end), 0.50);
-  }, 3500);
+  playFX(pick(liveSounds.announce), 0.65);     // ANKÜNDIGUNG
+  setTimeout(()=> playFX(pick(liveSounds.rise), 0.55), 600);     // RISE
+  setTimeout(()=> playFX(pick(liveSounds.explode), 0.65), 1400); // EXPLOSION
+  setTimeout(()=> playFX(pick(liveSounds.winloop), 0.45), 2000); // WIN LOOP
+  setTimeout(()=> playFX(pick(liveSounds.end), 0.55), 3500);     // END CHIME
 }
 
-/* JACKPOT‑TRIGGER IM SPIEL */
-function superJackpot(i){
-  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
-  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+/* SOUND UNLOCK */
+document.body.addEventListener("click", ()=>{
+  window.soundUnlocked = true;
+}, { once:true });
 
-  superPanel.children[i].textContent = "Jackpot: " + sym;
-
-  const hits = Math.floor(Math.random()*10)+1;
-
-  for(let h=0; h<hits; h++){
-    const cellIndex = Math.floor(Math.random()*756);
-    cells[cellIndex].style.background = "#ffaa00";
-    cells[cellIndex].style.transform = "scale(1.2)";
+/* JACKPOT OVERRIDE */
+const oldJackpot = superJackpot;
+superJackpot = function(i){
+  if(!window.soundUnlocked){
+    alert("Klick einmal irgendwo, um Sound zu aktivieren!");
   }
 
-  score += hits * 5;
-  updateScore();
-
-  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
-
-  /* ⭐ SOUND‑SEQUENZ STARTEN */
-  triggerJackpotFX();
-}
+  oldJackpot(i);      // Original Jackpot-Funktion
+  triggerJackpotFX(); // Sound hinzufügen
+};
 </script>
+
 
 
 </body>
