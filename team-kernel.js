@@ -1,4 +1,4 @@
-// team-kernel.js — GA ↔ meKI ↔ MIE
+// team-kernel.js — Dreieck + Würfel
 
 import { meKI } from "./meKI.js";
 import { loadAllRooms } from "./GateRoomLoader.js";
@@ -6,7 +6,7 @@ import { loadAllRooms } from "./GateRoomLoader.js";
 export async function TeamKernel(){
 
     const rooms = await loadAllRooms();
-    let currentRoom = rooms.meKI;
+    let room = rooms.meKI;
 
     let tick = 0;
     let turns = 0;
@@ -14,21 +14,15 @@ export async function TeamKernel(){
 
     setInterval(()=>{
 
-        const axiomMode = ["IN","OUT","IO"][slide % 3];
+        const axiom = ["IN","OUT","IO"][slide % 3];
 
-        const calc = meKI(
-            currentRoom,
-            tick,
-            turns,
-            axiomMode,
-            slide
-        );
+        const node = meKI(room, tick, turns, axiom, slide);
 
-        console.log("TEAM-KERNEL:", calc);
+        console.log("TEAM-WÜRFEL:", node);
 
-        if(calc.pulse.soll === 1) currentRoom = rooms.GA;
-        if(calc.pulse.soll === 2) currentRoom = rooms.meKI;
-        if(calc.pulse.soll === 3) currentRoom = rooms.MIE;
+        if(node.pulse.soll === 1) room = rooms.GA;
+        if(node.pulse.soll === 2) room = rooms.meKI;
+        if(node.pulse.soll === 3) room = rooms.MIE;
 
         tick++;
         turns++;
