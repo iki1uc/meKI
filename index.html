@@ -120,7 +120,20 @@
 <div id="final-screen"></div>
 
 <script>
-/* GRID SYMBOLS */
+/* ⭐ SOUND UNLOCK – Pflicht für ALLE Browser */
+let soundUnlocked = false;
+
+document.body.addEventListener("click", () => {
+  if(!soundUnlocked){
+    const a = new Audio();
+    a.play().catch(()=>{});
+    soundUnlocked = true;
+    console.log("Sound freigeschaltet.");
+  }
+}, { once:true });
+
+  
+  /* GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
