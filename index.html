@@ -120,7 +120,111 @@
 <div id="final-screen"></div>
 
 <script>
-/* ⭐ SOUND UNLOCK – Pflicht für ALLE Browser */
+
+<script type="module">
+
+import { loadAllRooms } from "./GateRoomLoader.js";
+import { stabiliseRoom } from "./WLOCH.js";
+import { liveSync } from "./NCLinkFullSync.js";
+import { nextGate, orbitGate } from "./GATE.js";
+
+/* ⭐ Mittelstation-Status */
+let MID_status = "INIT";
+let MID_gate = "GA";
+let MID_tick = 0;
+let MID_rooms = {};
+let MID_room = null;
+
+/* ⭐ Cubik-Station Hintergrund */
+function MID_cubikStation(){
+  const cube = document.createElement("div");
+  cube.style.position = "fixed";
+  cube.style.right = "20px";
+  cube.style.bottom = "20px";
+  cube.style.width = "80px";
+  cube.style.height = "80px";
+  cube.style.border = "3px solid #7dd3fc";
+  cube.style.opacity = "0.4";
+  cube.style.zIndex = "9999";
+  document.body.appendChild(cube);
+
+  let deg = 0;
+  setInterval(()=>{
+    deg += 2;
+    cube.style.transform = `rotateY(${deg}deg) rotateX(${deg/3}deg)`;
+  }, 40);
+}
+
+/* ⭐ Mittelstation laden */
+async function MID_init(){
+
+  try {
+    MID_rooms = await loadAllRooms();
+
+    if(!MID_rooms.meKI || !MID_rooms.GA || !MID_rooms.MIE){
+      MID_status = "❌ FEHLER: 3×756 Rooms fehlen";
+      alert(MID_status);
+      return;
+    }
+
+    MID_room = MID_rooms.GA;   // ⭐ Mittelstation startet bei GA
+    MID_status = "✔ Mittelstation OK · GA → meKI → MIE aktiv";
+
+    alert(MID_status);
+
+    MID_cubikStation();  // ⭐ Cubik-Station starten
+    liveSync();          // ⭐ NC-Link aktivieren
+
+  } catch(e){
+    MID_status = "❌ SYSTEMFEHLER: " + e.message;
+    alert(MID_status);
+  }
+}
+
+MID_init();
+
+/* ⭐ Mittelstation-Pulse */
+export function MID_pulse(){
+
+  MID_tick++;
+
+  // Gate-Wechsel
+  MID_gate = nextGate(MID_gate);
+  MID_gate = orbitGate(MID_tick);
+
+  // Raumwechsel
+  MID_room = MID_rooms[MID_gate];
+
+  // WLOCH-Stabilisierung
+  const pulse = stabiliseRoom(MID_room);
+
+  console.log("MID-PULSE:", {
+    tick: MID_tick,
+    gate: MID_gate,
+    pulse: pulse.meta,
+    room: MID_room.name
+  });
+}
+
+</script>
+MID_pulse();
+cell.onclick = () => {
+  MID_pulse();
+  updateScore();
+};
+triggerAxis(a, btn);
+MID_pulse();
+triggerSuper(i);
+MID_pulse();
+
+  
+  
+  
+  
+  
+  
+  
+  /* ⭐ SOUND UNLOCK – Pflicht für ALLE Browser */
 let soundUnlocked = false;
 
 document.body.addEventListener("click", () => {
