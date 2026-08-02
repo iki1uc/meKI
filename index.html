@@ -89,6 +89,28 @@ export function onExecute(){
         axiomMode,
         slide
     });
+<script type="module">
+
+import { TeamKernel } from "./team-kernel.js";
+import { visualize756 } from "./visualizer.js";
+import { loadAllRooms } from "./GateRoomLoader.js";
+
+async function start(){
+
+    const rooms = await loadAllRooms();
+
+    // 1. 756-Achsen anzeigen
+    visualize756(rooms);
+
+    // 2. Team-Kernel starten
+    TeamKernel();
+
+    console.log("AXIOMISCHES DREIECK GA–meKI–MIE AKTIV");
+}
+
+start();
+
+</script>
 
     console.log("GAME-VERDICT:", verdict);
 
