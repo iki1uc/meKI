@@ -1,46 +1,23 @@
-<script type="module">
-
-/* TEAM-WORK MODULES (RUN) */
-import { RealityPulse } from "./RUN/realitypulse.js";
-import { MIACORE } from "./RUN/mia-core.js";
-import { MIATribunal } from "./RUN/mia-tribunal.js";
-import { techPulse } from "./RUN/tech.js";
-import { nextGate, orbitGate } from "./RUN/gates.js";
-import { stabiliseRoom } from "./RUN/wloch.js";
-import { ecoShift } from "./RUN/eco-shift.js";
-
-/* GA ↔ MIE ROOM SYSTEM */
-import { loadAllRooms } from "./GateRoomLoader.js";
-
-/* 3-AXIOM-IN/OUT SYSTEM */
-const AXIOM = {
-    IN: ["GA-IN", "meKI-IN", "MIE-IN"],
-    OUT: ["GA-OUT", "meKI-OUT", "MIE-OUT"]
-};
+import { addCombo, executeCombo } from "./combo.js";
+import { applyColorRules } from "./score.js";
+import { nextGate, orbitGate } from "./gates.js";
+import { techPulse } from "./tech.js";
+import { RealityPulse } from "./realitypulse.js";
+import { MIACORE } from "./mia-core.js";
+import { MIATribunal } from "./mia-tribunal.js";
+import { stabiliseRoom } from "./wloch.js";
+import { ecoShift } from "./eco-shift.js";
 
 /* TEAM-WORK META */
-let rooms = {};
-let current = null;
+let turns = 0;
+let score = 0;
 let tick = 0;
 let gate = "GA";          // Start-Gate
 let axiomMode = "IN";     // Start-Axiom
-let slide = 0;            // Slide-3 System
+let slide = 0;
 
-async function initTeamWork(){
-
-    rooms = await loadAllRooms();
-
-    /* SPIEL STARTET BEI meKI */
-    current = rooms.meKI;
-
-    console.log("TEAM-WORK START:", {
-        startRoom: "meKI",
-        axiomMode,
-        gate
-    });
-}
-
-initTeamWork();
+/* ROOM POINTER (GA ↔ meKI ↔ MIE TEAM-WORK) */
+let currentRoom = rooms.GA;
 
 /* SLIDE-3 AXIOM SYSTEM */
 function slideAxiom(){
@@ -48,57 +25,71 @@ function slideAxiom(){
 
     if(slide % 3 === 1) axiomMode = "IN";
     if(slide % 3 === 2) axiomMode = "OUT";
-    if(slide % 3 === 0) axiomMode = "IN-OUT";
+    if(slide % 3 === 0) axiomMode = "IO";
 
     console.log("AXIOM-MODE:", axiomMode);
 }
 
-/* TEAM-WORK LOOP */
-setInterval(()=>{
+/* UNTERE BUTTONS → KEINE KOSTEN */
+export function onLowerButton(action){
+    addCombo(action);
+}
 
-    /* 1. WLOCH-PULSE */
-    const pulse = stabiliseRoom(current);
+/* AUSFÜHRENDE INSTANZ → ALLES = EIN ZUG */
+export function onExecute(){
 
-    /* 2. 756-TECH */
-    const tech = techPulse(tick);
+    turns++;
 
-    /* 3. MODE (ALL-IN / ALL-OUT) */
-    const mode = (tick % 2 === 0) ? "ALL-IN" : "ALL-OUT";
+    /* 1. Combo ausführen */
+    const comboResult = executeCombo();
 
-    /* 4. 3-RESPO-GATE */
+    /* 2. Farben-Regeln */
+    score = applyColorRules(comboResult, score, turns);
+
+    /* 3. 3-RESPO-GATEN */
     gate = nextGate(gate);
 
-    /* 5. ALLXALL-ORBIT */
-    gate = orbitGate(tick);
+    /* 4. ALLXALL-Orbit */
+    gate = orbitGate(turns);
 
-    /* 6. RealityPulse */
-    const reality = RealityPulse(current, tick);
+    /* 5. 756-Achsen Tech */
+    const tech = techPulse(tick);
 
-    /* 7. MIA-CORE + TRIBUNAL */
+    /* 6. WLOCH-Pulse */
+    const pulse = stabiliseRoom(currentRoom);
+
+    /* 7. RealityPulse */
+    const reality = RealityPulse(currentRoom, tick);
+
+    /* 8. MIA-CORE + MIA-TRIBUNAL */
     const verdict = MIATribunal({
         pulse,
         tech,
-        mode,
+        mode: reality.meta.mode,
+        score,
+        turns,
         gate,
         axiomMode,
         slide
     });
 
-    console.log("TEAM-WORK VERDICT:", verdict);
+    console.log("GAME-VERDICT:", verdict);
 
-    /* 8. ECO-3D SHIFT */
+    /* 9. ECO-3D SHIFT */
     ecoShift(reality);
 
-    /* 9. ROOM ROUTING */
-    if(pulse.soll === 2) current = rooms.meKI;
-    if(pulse.soll === 3) current = rooms.MIE;
-    if(pulse.soll === 1) current = rooms.GA;
+    /* 10. ROOM ROUTING (GA ↔ meKI ↔ MIE TEAM-WORK) */
+    if(pulse.soll === 2) currentRoom = rooms.meKI;
+    if(pulse.soll === 3) currentRoom = rooms.MIE;
+    if(pulse.soll === 1) currentRoom = rooms.GA;
 
-    /* 10. SLIDE-3 AXIOM */
+    /* 11. SLIDE-3 AXIOM */
     slideAxiom();
 
     tick++;
 
-}, 300);
-
-</script>
+    /* 12. SPIELENDE */
+    if(turns >= 13){
+        endGame(verdict);
+    }
+}
