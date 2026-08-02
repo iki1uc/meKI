@@ -14,6 +14,14 @@ export const SETPulse = {
         return (tick % 2 === 0) ? "ALL-IN" : "ALL-OUT";
     },
 
+// SET.js 
+import { RealityPulse } from "./RealityPulse.js";
+
+export function SET(current, tick){
+    return RealityPulse(current, tick);
+}
+
+    
     tech(tick){
         return {
             ix: tick % 9,
