@@ -129,6 +129,77 @@ function restartGame(){
     ho: null,
     it: null
   };
+function restartGame(){
+
+  /* SCORE */
+  score = 0;
+  displayScore = 0;
+  document.getElementById("score").textContent = "Score: 0";
+
+  /* JACKPOT */
+  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+
+  /* GRID */
+  cells.forEach(c=>{
+    c.style.background = "#000";
+    c.style.transform = "none";
+    c.style.border = "1px solid #1f2937";
+  });
+
+  /* PANELS */
+  [...axisPanel.children].forEach(btn=>{
+    btn.style.background = "#0b1220";
+  });
+
+  [...superPanel.children].forEach(btn=>{
+    btn.style.background = "#0b1220";
+    btn.textContent = btn.textContent.split(":")[0];
+  });
+
+  /* MITTELSTATION */
+  MID_tick = 0;
+  MID_gate = "GA";
+  MID_room = MID_rooms.GA;
+
+  /* RAUM-MATRIX (756 → pre/mid/post) */
+  const room = {
+    pre: cells.slice(0, 378),
+    mid: cells[378],
+    post: cells.slice(379),
+    teamActive: false,
+    axisState: "neutral"
+  };
+
+  /* STATE für OPTA/QI/IQQ/PI */
+  const state = {
+    score: 0,
+    clicks: 0,
+    axisGood: 0,
+    axisBad: 0,
+    superHits: 0,
+    superClicks: 0,
+    jackpots: 0,
+    metaVariance: 0,
+
+    room,
+    echo: null,
+    core: null,
+    dsy: null,
+    do: null,
+    ho: null,
+    it: null
+  };
+
+  /* PI-System neu berechnen */
+  const pi = PI(state);
+
+  console.log("PI-System:", pi);
+
+  /* FINAL-SCREEN */
+  document.getElementById("final-screen").style.display = "none";
+
+  console.log("NEUSTART: System + PI vollständig zurückgesetzt.");
+}
 
   const opta = OPTA(state);
   const qi   = QI(state.room);
