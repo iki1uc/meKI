@@ -1,69 +1,104 @@
-import { addCombo, executeCombo } from "./combo.js";
-import { applyColorRules } from "./score.js";
-import { nextGate, orbitGate } from "./gates.js";
-import { techPulse } from "./tech.js";
-import { RealityPulse } from "./realitypulse.js";
-import { MIACORE } from "./mia-core.js";
-import { MIATribunal } from "./mia-tribunal.js";
-import { stabiliseRoom } from "./wloch.js";
-import { ecoShift } from "./eco-shift.js";
+<script type="module">
 
-let turns = 0;
-let score = 0;
+/* TEAM-WORK MODULES (RUN) */
+import { RealityPulse } from "./RUN/realitypulse.js";
+import { MIACORE } from "./RUN/mia-core.js";
+import { MIATribunal } from "./RUN/mia-tribunal.js";
+import { techPulse } from "./RUN/tech.js";
+import { nextGate, orbitGate } from "./RUN/gates.js";
+import { stabiliseRoom } from "./RUN/wloch.js";
+import { ecoShift } from "./RUN/eco-shift.js";
+
+/* GA ↔ MIE ROOM SYSTEM */
+import { loadAllRooms } from "./GateRoomLoader.js";
+
+/* 3-AXIOM-IN/OUT SYSTEM */
+const AXIOM = {
+    IN: ["GA-IN", "meKI-IN", "MIE-IN"],
+    OUT: ["GA-OUT", "meKI-OUT", "MIE-OUT"]
+};
+
+/* TEAM-WORK META */
+let rooms = {};
+let current = null;
 let tick = 0;
-let gate = "GA";
-let currentRoom = rooms.GA;
+let gate = "GA";          // Start-Gate
+let axiomMode = "IN";     // Start-Axiom
+let slide = 0;            // Slide-3 System
 
-// Untere Buttons → keine Kosten
-export function onLowerButton(action){
-    addCombo(action);
+async function initTeamWork(){
+
+    rooms = await loadAllRooms();
+
+    /* SPIEL STARTET BEI meKI */
+    current = rooms.meKI;
+
+    console.log("TEAM-WORK START:", {
+        startRoom: "meKI",
+        axiomMode,
+        gate
+    });
 }
 
-// Ausführende Instanz → alles zusammen = EIN Zug
-export function onExecute(){
+initTeamWork();
 
-    turns++;
+/* SLIDE-3 AXIOM SYSTEM */
+function slideAxiom(){
+    slide++;
 
-    // 1. Combo ausführen
-    const comboResult = executeCombo();
+    if(slide % 3 === 1) axiomMode = "IN";
+    if(slide % 3 === 2) axiomMode = "OUT";
+    if(slide % 3 === 0) axiomMode = "IN-OUT";
 
-    // 2. Farben-Regeln anwenden
-    score = applyColorRules(comboResult, score, turns);
+    console.log("AXIOM-MODE:", axiomMode);
+}
 
-    // 3. 3-RESPO-GATEN
-    gate = nextGate(gate);
+/* TEAM-WORK LOOP */
+setInterval(()=>{
 
-    // 4. ALLXALL-Orbit
-    gate = orbitGate(turns);
+    /* 1. WLOCH-PULSE */
+    const pulse = stabiliseRoom(current);
 
-    // 5. 756-Achsen Tech
+    /* 2. 756-TECH */
     const tech = techPulse(tick);
 
-    // 6. WLOCH-Pulse
-    const pulse = stabiliseRoom(currentRoom);
+    /* 3. MODE (ALL-IN / ALL-OUT) */
+    const mode = (tick % 2 === 0) ? "ALL-IN" : "ALL-OUT";
 
-    // 7. RealityPulse
-    const reality = RealityPulse(currentRoom, tick);
+    /* 4. 3-RESPO-GATE */
+    gate = nextGate(gate);
 
-    // 8. MIA-CORE + MIA-TRIBUNAL
+    /* 5. ALLXALL-ORBIT */
+    gate = orbitGate(tick);
+
+    /* 6. RealityPulse */
+    const reality = RealityPulse(current, tick);
+
+    /* 7. MIA-CORE + TRIBUNAL */
     const verdict = MIATribunal({
         pulse,
         tech,
-        mode: reality.meta.mode,
-        score,
-        turns,
-        gate
+        mode,
+        gate,
+        axiomMode,
+        slide
     });
 
-    console.log("GAME-VERDICT:", verdict);
+    console.log("TEAM-WORK VERDICT:", verdict);
 
-    // 9. ECO-3D Shift-Indexer
+    /* 8. ECO-3D SHIFT */
     ecoShift(reality);
+
+    /* 9. ROOM ROUTING */
+    if(pulse.soll === 2) current = rooms.meKI;
+    if(pulse.soll === 3) current = rooms.MIE;
+    if(pulse.soll === 1) current = rooms.GA;
+
+    /* 10. SLIDE-3 AXIOM */
+    slideAxiom();
 
     tick++;
 
-    // 10. Spielende nach 13 Zügen
-    if(turns >= 13){
-        endGame(verdict);
-    }
-}
+}, 300);
+
+</script>
