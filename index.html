@@ -17,6 +17,26 @@ let axiomMode = "IN";
 let slide = 0;
 <script type="module">
 <script type="module">
+<script type="module">
+
+import { TeamKernel } from "./team-kernel.js";
+import { visualize2268 } from "./visualizer.js";
+import { loadAllRooms } from "./GateRoomLoader.js";
+
+async function start(){
+
+    const rooms = await loadAllRooms();
+
+    visualize2268(rooms);
+
+    TeamKernel();
+
+    console.log("ALLXALL 360° — GA ↔ meKI ↔ MIE — 2268-Achsen-Würfel aktiv");
+}
+
+start();
+
+</script>
 
 import { TeamKernel } from "./team-kernel.js";
 import { visualize756 } from "./visualizer.js";
