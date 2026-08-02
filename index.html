@@ -5,56 +5,27 @@
 <title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-#score {
-  position:fixed;
-  top:0;
-  left:50%;
-  transform:translateX(-50%);
-  color:#7dd3fc;
-  font-size:32px;
-  padding:10px;
-  z-index:99999;
-  text-shadow:0 0 10px #00eaff, 0 0 20px #00eaff;
-  transition:transform .2s ease, color .2s ease;
-}
-let score = 0;
-let displayScore = 0;
+<style>
+  body {
+    background:#000;
+    color:#7dd3fc;
+    font-family:monospace;
+    margin:0;
+    overflow:hidden;
+  }
 
-function updateScore(amount = 1){
-  score += amount;
-
-  const scoreEl = document.getElementById("score");
-
-  // Animation
-  scoreEl.style.transform = "scale(1.3)";
-  scoreEl.style.color = "#00eaff";
-
-  setTimeout(()=>{
-    scoreEl.style.transform = "scale(1)";
-    scoreEl.style.color = "#7dd3fc";
-  }, 150);
-
-  // Smooth Counter
-  const step = () => {
-    if(displayScore < score){
-      displayScore++;
-      scoreEl.textContent = "Score: " + displayScore;
-      requestAnimationFrame(step);
-    }
-  };
-  step();
-}
-
-
+  /* ⭐ ALLXALL SCORE */
   #score {
     position:fixed;
     top:0;
     left:50%;
     transform:translateX(-50%);
     color:#7dd3fc;
-    font-size:20px;
+    font-size:32px;
     padding:10px;
     z-index:99999;
+    text-shadow:0 0 10px #00eaff, 0 0 20px #00eaff;
+    transition:transform .2s ease, color .2s ease;
   }
 
   #grid {
@@ -122,7 +93,6 @@ function updateScore(amount = 1){
     transition:.2s;
   }
 
-  /* FINAL SCREEN */
   #final-screen {
     position:fixed;
     top:0; left:0; right:0; bottom:0;
@@ -138,38 +108,36 @@ function updateScore(amount = 1){
     padding:20px;
     font-size:22px;
   }
+
+  /* ⭐ START-SCREEN */
+  #start-screen {
+    position:fixed; top:0; left:0; right:0; bottom:0;
+    background:#000; color:#7dd3fc; font-family:monospace;
+    display:flex; flex-direction:column; justify-content:center;
+    align-items:center; text-align:center; z-index:999999;
+    padding:20px; font-size:22px;
+  }
 </style>
 </head>
 
 <body>
 
+<!-- ⭐ SCORE -->
 <div id="score">Score: 0</div>
+
+<!-- ⭐ PANELS -->
 <div id="axis-panel"></div>
 <div id="super-panel"></div>
 <div id="jackpot-slot">Jackpot: —</div>
 
+<!-- ⭐ GRID -->
 <div id="grid"></div>
+
+<!-- ⭐ FINAL SCREEN -->
 <div id="final-screen"></div>
 
-<script>
-<!-- ⭐ ALLXALL AIR / AIV / XI / IX / X4 SYSTEM -->
-<script>
-
-/* ============================================================
-   1. START-SCREEN (3 MODI)
-   ============================================================ */
-
-const startScreen = document.createElement("div");
-startScreen.id = "start-screen";
-startScreen.style.cssText = `
-  position:fixed; top:0; left:0; right:0; bottom:0;
-  background:#000; color:#7dd3fc; font-family:monospace;
-  display:flex; flex-direction:column; justify-content:center;
-  align-items:center; text-align:center; z-index:999999;
-  padding:20px; font-size:22px;
-`;
-
-startScreen.innerHTML = `
+<!-- ⭐ START SCREEN -->
+<div id="start-screen">
   <div style="font-size:40px; margin-bottom:20px;">meKI · ALLXALL</div>
 
   <button id="mode-score" style="margin:10px; padding:12px 20px;">Spiel‑Score‑Modus</button>
@@ -178,177 +146,123 @@ startScreen.innerHTML = `
 
   <div id="discord-box" style="margin-top:40px; font-size:18px; opacity:0.8;">
     <div>──────────────</div>
-    <div id="discord-line">Discord: HIER DEINE ADRESSE</div>
+    <div id="discord-line">Discord: @iki1uc</div>
     <div>──────────────</div>
   </div>
-`;
+</div>
 
-document.body.appendChild(startScreen);
-
-/* ============================================================
-   2. START-SCREEN BUTTONS
-   ============================================================ */
-
-document.getElementById("mode-score").onclick = () => startGame("SCORE");
-document.getElementById("mode-info").onclick = () => startGame("INFO");
-document.getElementById("mode-contact").onclick = () => startGame("CONTACT");
-
-/* ============================================================
-   3. GAME STARTER
-   ============================================================ */
-
-function startGame(mode){
-  window.currentMode = mode;
-
-  // AIR / AIV Stabilisierung
-  AIR_AIV_Stabilize();
-
-  // Start-Screen ausblenden
-  startScreen.style.display = "none";
-
-  // Mode-spezifische Aktionen
-  if(mode === "INFO"){
-    alert("Erklär-Modus aktiviert.\nDas Spiel zeigt dir Hinweise und Tipps.");
-  }
-  if(mode === "CONTACT"){
-    alert("Kontakt-Modus aktiviert.\nDiscord-Adresse sichtbar.");
-  }
-}
-
-/* ============================================================
-   4. AIR / AIV / XI / IX / X4 Stabilisierung
-   ============================================================ */
-
-function AIR_AIV_Stabilize(){
-  console.log("ALLXALL AIR/AIV Stabilisierung aktiv — 360° Passagenkontrolle");
-
-  // 360° Fehlerblocker
-  window.onerror = function(){
-    console.log("AIR: Fehler abgefangen — Spiel bleibt stabil.");
-    return true;
-  };
-
-  // X4 Reset-Schutz
-  window.addEventListener("unhandledrejection", ()=>{
-    console.log("AIV: Promise-Fehler abgefangen.");
-  });
-}
-
-/* ============================================================
-   5. NEUSTART-TASTE
-   ============================================================ */
-
-const restartBtn = document.createElement("button");
-restartBtn.textContent = "NEUSTART";
-restartBtn.style.cssText = `
-  position:fixed; top:10px; right:10px;
-  background:#ffaa00; color:#000; padding:10px 20px;
-  border:none; border-radius:6px; z-index:999999;
-  cursor:pointer; font-weight:bold;
-`;
-restartBtn.onclick = resetGame;
-
-document.body.appendChild(restartBtn);
-
-/* ============================================================
-   6. GAME RESET
-   ============================================================ */
-
-function resetGame(){
-  console.log("ALLXALL RESET — X4 Stabilisierung");
-
-  // Score zurücksetzen
-  score = 0;
-  displayScore = 0;
-  document.getElementById("score").textContent = "Score: 0";
-
-  // Grid zurücksetzen
-  cells.forEach(c=>{
-    c.style.background = "#000";
-    c.style.transform = "scale(1)";
-  });
-
-  // Panels zurücksetzen
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
-
-  // Start-Screen wieder anzeigen
-  startScreen.style.display = "flex";
-}
-
-</script>
-
-  
-  
-  /* GRID SYMBOLS */
+<script>
+/* ⭐ GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
   "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
 ];
-<!-- LIVE CASINO SOUND ENGINE (NO FILES NEEDED) -->
-<script>
-<!-- ⭐ 7SINN SYSTEM -->
-<script>
-/* 7 SINN MODES */
-const sevenSinn = [
-  { name:"S1", color:"#ff4444", score:2, sound:"https://cdn.pixabay.com/download/audio/2021/09/16/audio_3f1b1f.mp3?filename=arcade-explosion-100573.mp3" },
-  { name:"S2", color:"#ffaa00", score:3, sound:"https://cdn.pixabay.com/download/audio/2022/03/15/audio_0f1e3b.mp3?filename=game-notification-113985.mp3" },
-  { name:"S3", color:"#ffee33", score:4, sound:"https://cdn.pixabay.com/download/audio/2021/09/16/audio_4f3b1f.mp3?filename=arcade-bleep-1-100571.mp3" },
-  { name:"S4", color:"#33ff33", score:5, sound:"https://cdn.pixabay.com/download/audio/2021/08/09/audio_6d1f2a.mp3?filename=slot-machine-6891.mp3" },
-  { name:"S5", color:"#33bbff", score:6, sound:"https://cdn.pixabay.com/download/audio/2022/03/15/audio_7c1e3b.mp3?filename=game-level-up-113986.mp3" },
-  { name:"S6", color:"#8833ff", score:7, sound:"https://cdn.pixabay.com/download/audio/2021/09/16/audio_6f1b1f.mp3?filename=arcade-melody-100575.mp3" },
-  { name:"S7", color:"#ff33aa", score:10, sound:"https://cdn.pixabay.com/download/audio/2021/09/16/audio_5f1b1f.mp3?filename=arcade-win-100574.mp3" }
+
+/* ⭐ SCORE SYSTEM */
+let score = 0;
+let displayScore = 0;
+
+function updateScore(amount = 1){
+  score += amount;
+
+  const scoreEl = document.getElementById("score");
+
+  scoreEl.style.transform = "scale(1.3)";
+  scoreEl.style.color = "#00eaff";
+
+  setTimeout(()=>{
+    scoreEl.style.transform = "scale(1)";
+    scoreEl.style.color = "#7dd3fc";
+  }, 150);
+
+  const step = () => {
+    if(displayScore < score){
+      displayScore++;
+      scoreEl.textContent = "Score: " + displayScore;
+      requestAnimationFrame(step);
+    }
+  };
+  step();
+}
+
+/* ⭐ GRID BUILD */
+const grid = document.getElementById("grid");
+const cells = [];
+
+for(let i=0;i<756;i++){
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.textContent = symbols[i % symbols.length];
+
+  cell.onclick = () => {
+    const deg = Math.floor(Math.random()*360);
+    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
+
+    cell.style.transform = "rotate(" + deg + "deg)";
+    cell.style.background = col;
+
+    updateScore();
+  };
+
+  grid.appendChild(cell);
+  cells.push(cell);
+}
+
+/* ⭐ AXIS PANEL */
+const axisPanel = document.getElementById("axis-panel");
+
+for(let a=0; a<27; a++){
+  const btn = document.createElement("button");
+  btn.textContent = "A" + (a+1);
+
+  btn.onclick = () => updateScore(3);
+
+  axisPanel.appendChild(btn);
+}
+
+/* ⭐ SUPER PANEL */
+const superPanel = document.getElementById("super-panel");
+const superNames = [
+  "Schach","Skat","Rommé",
+  "Jackpot","Domino","Combo",
+  "Bonus","Axiom","Orbit"
 ];
 
-/* CURRENT MODE */
-let sinnMode = 0;
+for(let i=0;i<9;i++){
+  const btn = document.createElement("button");
+  btn.textContent = superNames[i];
 
-/* CHANGE MODE EVERY SECOND */
-setInterval(()=>{
-  sinnMode = (sinnMode + 1) % 7;
+  btn.onclick = () => triggerSuper(i);
 
-  const mode = sevenSinn[sinnMode];
+  superPanel.appendChild(btn);
+}
 
-  // Score glow
-  const scoreEl = document.getElementById("score");
-  scoreEl.style.textShadow = `0 0 20px ${mode.color}, 0 0 40px ${mode.color}`;
+/* ⭐ SUPER FUNCTIONS */
+function triggerSuper(i){
+  if(i === 3){
+    superJackpot(i);
+  } else {
+    updateScore(5);
+  }
+}
 
-  // Play mode sound
-  playFX(mode.sound, 0.35);
+/* ⭐ JACKPOT FX */
+function superJackpot(i){
+  superPanel.children[i].textContent = "Jackpot!";
 
-}, 1000);
+  for(let h=0; h<10; h++){
+    const cellIndex = Math.floor(Math.random()*756);
+    cells[cellIndex].style.background = "#ffaa00";
+    cells[cellIndex].style.transform = "scale(1.2)";
+  }
 
-/* APPLY 7SINN TO GRID CLICK */
-const oldCellClick = updateScore;
-updateScore = function(amount = 1){
-  const mode = sevenSinn[sinnMode];
-  oldCellClick(amount * mode.score);
-};
+  updateScore(50);
+  triggerJackpotFX();
+}
 
-/* APPLY 7SINN TO JACKPOT */
-const oldJackpotFX = triggerJackpotFX;
-triggerJackpotFX = function(){
-  const mode = sevenSinn[sinnMode];
-
-  // Jackpot color pulse
-  document.getElementById("jackpot-slot").style.color = mode.color;
-
-  // Jackpot score boost
-  updateScore(mode.score * 20);
-
-  // Jackpot sound
-  playFX(mode.sound, 0.65);
-
-  oldJackpotFX();
-};
-</script>
-
-  
-  
-  
-  
-  /* KOSTENLOSE ONLINE-SOUNDS */
+/* ⭐ LIVE CASINO SOUND ENGINE */
 const liveSounds = {
   announce: [
     "https://cdn.pixabay.com/download/audio/2022/03/15/audio_0f1e3b.mp3?filename=game-notification-113985.mp3",
@@ -372,45 +286,134 @@ const liveSounds = {
   ]
 };
 
-/* PLAYER */
 function playFX(url, vol=0.45){
   const a = new Audio(url);
   a.volume = vol;
   a.play().catch(()=>{});
 }
 
-/* PICK RANDOM */
 function pick(arr){
   return arr[Math.floor(Math.random()*arr.length)];
 }
 
-/* JACKPOT SEQUENCE */
 function triggerJackpotFX(){
-  playFX(pick(liveSounds.announce), 0.65);     // ANKÜNDIGUNG
-  setTimeout(()=> playFX(pick(liveSounds.rise), 0.55), 600);     // RISE
-  setTimeout(()=> playFX(pick(liveSounds.explode), 0.65), 1400); // EXPLOSION
-  setTimeout(()=> playFX(pick(liveSounds.winloop), 0.45), 2000); // WIN LOOP
-  setTimeout(()=> playFX(pick(liveSounds.end), 0.55), 3500);     // END CHIME
+  playFX(pick(liveSounds.announce), 0.65);
+  setTimeout(()=> playFX(pick(liveSounds.rise), 0.55), 600);
+  setTimeout(()=> playFX(pick(liveSounds.explode), 0.65), 1400);
+  setTimeout(()=> playFX(pick(liveSounds.winloop), 0.45), 2000);
+  setTimeout(()=> playFX(pick(liveSounds.end), 0.55), 3500);
 }
 
-/* SOUND UNLOCK */
 document.body.addEventListener("click", ()=>{
   window.soundUnlocked = true;
 }, { once:true });
 
-/* JACKPOT OVERRIDE */
-const oldJackpot = superJackpot;
-superJackpot = function(i){
-  if(!window.soundUnlocked){
-    alert("Klick einmal irgendwo, um Sound zu aktivieren!");
-  }
+/* ⭐ 7SINN SYSTEM */
+const sevenSinn = [
+  { name:"S1", color:"#ff4444", score:2, sound:liveSounds.explode[0] },
+  { name:"S2", color:"#ffaa00", score:3, sound:liveSounds.announce[0] },
+  { name:"S3", color:"#ffee33", score:4, sound:liveSounds.announce[1] },
+  { name:"S4", color:"#33ff33", score:5, sound:liveSounds.rise[0] },
+  { name:"S5", color:"#33bbff", score:6, sound:liveSounds.rise[1] },
+  { name:"S6", color:"#8833ff", score:7, sound:liveSounds.winloop[1] },
+  { name:"S7", color:"#ff33aa", score:10, sound:liveSounds.winloop[0] }
+];
 
-  oldJackpot(i);      // Original Jackpot-Funktion
-  triggerJackpotFX(); // Sound hinzufügen
+let sinnMode = 0;
+
+setInterval(()=>{
+  sinnMode = (sinnMode + 1) % 7;
+
+  const mode = sevenSinn[sinnMode];
+
+  const scoreEl = document.getElementById("score");
+  scoreEl.style.textShadow = `0 0 20px ${mode.color}, 0 0 40px ${mode.color}`;
+
+  playFX(mode.sound, 0.35);
+
+}, 1000);
+
+const oldCellClick = updateScore;
+updateScore = function(amount = 1){
+  const mode = sevenSinn[sinnMode];
+  oldCellClick(amount * mode.score);
 };
+
+const oldJackpotFX = triggerJackpotFX;
+triggerJackpotFX = function(){
+  const mode = sevenSinn[sinnMode];
+
+  document.getElementById("jackpot-slot").style.color = mode.color;
+
+  updateScore(mode.score * 20);
+
+  playFX(mode.sound, 0.65);
+
+  oldJackpotFX();
+};
+
+/* ⭐ START-SCREEN LOGIK */
+document.getElementById("mode-score").onclick = () => startGame("SCORE");
+document.getElementById("mode-info").onclick = () => startGame("INFO");
+document.getElementById("mode-contact").onclick = () => startGame("CONTACT");
+
+function startGame(mode){
+  window.currentMode = mode;
+
+  AIR_AIV_Stabilize();
+
+  document.getElementById("start-screen").style.display = "none";
+
+  if(mode === "INFO"){
+    alert("Erklär-Modus aktiviert.\nDas Spiel zeigt dir Hinweise und Tipps.");
+  }
+  if(mode === "CONTACT"){
+    alert("Kontakt-Modus aktiviert.\nDiscord-Adresse sichtbar.");
+  }
+}
+
+/* ⭐ AIR / AIV / XI / IX / X4 Stabilisierung */
+function AIR_AIV_Stabilize(){
+  window.onerror = function(){
+    console.log("AIR: Fehler abgefangen — Spiel bleibt stabil.");
+    return true;
+  };
+
+  window.addEventListener("unhandledrejection", ()=>{
+    console.log("AIV: Promise-Fehler abgefangen.");
+  });
+}
+
+/* ⭐ NEUSTART-TASTE */
+const restartBtn = document.createElement("button");
+restartBtn.textContent = "NEUSTART";
+restartBtn.style.cssText = `
+  position:fixed; top:10px; right:10px;
+  background:#ffaa00; color:#000; padding:10px 20px;
+  border:none; border-radius:6px; z-index:999999;
+  cursor:pointer; font-weight:bold;
+`;
+restartBtn.onclick = resetGame;
+
+document.body.appendChild(restartBtn);
+
+/* ⭐ RESET */
+function resetGame(){
+  score = 0;
+  displayScore = 0;
+  document.getElementById("score").textContent = "Score: 0";
+
+  cells.forEach(c=>{
+    c.style.background = "#000";
+    c.style.transform = "scale(1)";
+  });
+
+  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+
+  document.getElementById("start-screen").style.display = "flex";
+}
+
 </script>
-
-
 
 </body>
 </html>
