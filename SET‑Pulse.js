@@ -1,32 +1,24 @@
-// Bewertungssystem
-import { SETPulse } from "./SET-Pulse.js";
-import { SETIReality } from "./SETI-Reality.js";
+// SET-Pulse.js (NEU)
+export const SETPulse = {
 
-export function RealityPulse(current, tick){
+    axis: "GA-meKI-MIE",
 
-    const soll = SETPulse.next(current.ist);
+    next(ist){
+        if(ist === 1) return 2;   // GA → meKI
+        if(ist === 2) return 3;   // meKI → MIE
+        if(ist === 3) return 1;   // MIE → GA
+        return 1;
+    },
 
-    const pulse = {
-        gate: current.gate,
-        ist: current.ist,
-        soll
-    };
+    tech(tick){
+        return {
+            ix: tick % 9,
+            xi: tick % 11,
+            x4: tick % 4
+        };
+    },
 
-    const tech = SETPulse.tech(tick);
-    const mode = SETPulse.mode(tick);
-
-    const meta = {
-        axis: SETPulse.axis,
-        pulse,
-        tech,
-        mode
-    };
-
-    const eval = SETIReality.evaluate(meta);
-
-    return {
-        pulse,
-        meta,
-        eval
-    };
-}
+    mode(tick){
+        return (tick % 2 === 0) ? "ALL-IN" : "ALL-OUT";
+    }
+};
