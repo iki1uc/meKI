@@ -58,6 +58,96 @@ export function PI(state){
     it: state.it
   };
 }
+function restartGame(){
+
+  /* -----------------------------------------
+     1 · SCORE & JACKPOT
+  ----------------------------------------- */
+  score = 0;
+  displayScore = 0;
+  document.getElementById("score").textContent = "Score: 0";
+  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+
+
+  /* -----------------------------------------
+     2 · GRID (756 Raum)
+  ----------------------------------------- */
+  cells.forEach(c=>{
+    c.style.background = "#000";
+    c.style.transform = "none";
+    c.style.border = "1px solid #1f2937";
+  });
+
+
+  /* -----------------------------------------
+     3 · PANELS
+  ----------------------------------------- */
+  [...axisPanel.children].forEach(btn=>{
+    btn.style.background = "#0b1220";
+  });
+
+  [...superPanel.children].forEach(btn=>{
+    btn.style.background = "#0b1220";
+    btn.textContent = btn.textContent.split(":")[0];
+  });
+
+
+  /* -----------------------------------------
+     4 · MITTELSTATION
+  ----------------------------------------- */
+  MID_tick = 0;
+  MID_gate = "GA";
+  MID_room = MID_rooms.GA;
+
+
+  /* -----------------------------------------
+     5 · OPTA / QI / IQQ / PI — SYSTEM RESET
+  ----------------------------------------- */
+
+  const state = {
+    score: 0,
+    clicks: 0,
+    axisGood: 0,
+    axisBad: 0,
+    superHits: 0,
+    superClicks: 0,
+    jackpots: 0,
+    metaVariance: 0,
+
+    room: {
+      mid: cells[378],
+      pre: cells.slice(0, 378),
+      post: cells.slice(379),
+      teamActive: false,
+      axisState: "neutral"
+    },
+
+    echo: null,
+    core: null,
+    dsy: null,
+    do: null,
+    ho: null,
+    it: null
+  };
+
+  const opta = OPTA(state);
+  const qi   = QI(state.room);
+  const iqq  = IQQ(opta, qi);
+  const pi   = PI(state);
+
+  console.log("OPTA:", opta);
+  console.log("QI:", qi);
+  console.log("IQQ:", iqq);
+  console.log("PI:", pi);
+
+
+  /* -----------------------------------------
+     6 · FINAL SCREEN
+  ----------------------------------------- */
+  document.getElementById("final-screen").style.display = "none";
+
+  console.log("NEUSTART: System + OPTA/QI/IQQ/PI vollständig zurückgesetzt.");
+}
 
 
   // Axis-Panel zurücksetzen
