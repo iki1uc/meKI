@@ -145,11 +145,7 @@ function updateScore(v=1){
   document.getElementById("score").textContent = "Score: " + score;
   checkEnd();
 }
-function checkEnd(){
-  if(score >= 500){
-    alert("🎉 GAME OVER — Du hast 500 Punkte erreicht!");
-    location.reload();
-  }
+
 }
 function checkGridEnd(){
   let active = 0;
@@ -351,18 +347,6 @@ function superJackpot(i){
   document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
 }
 
-/* FINAL‑SCREEN */
-function FINAL(title, text){
-  const FS = document.getElementById("final-screen");
-  FS.innerHTML = `
-    <div style="font-size:40px; margin-bottom:20px;">${title}</div>
-    <div style="margin-bottom:40px;">${text}</div>
-    <div id="cube" style="width:120px; height:120px; border:3px solid #7dd3fc;"></div>
-  `;
-  FS.style.display = "flex";
-  CUBE_ANIM();
-}
-
 /* 3D‑Zauberwürfel‑Animation */
 function CUBE_ANIM(){
   let deg = 0;
@@ -388,6 +372,20 @@ setTimeout(()=>{
   if(r === 2) FINAL("2268‑Würfel‑Finale", "ALLXALL‑Kontinuum stabilisiert.");
   if(r === 3) FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
   if(r === 4) OUTRO();
+
+  
+/* FINAL‑SCREEN */
+function FINAL(title, text){
+  const FS = document.getElementById("final-screen");
+  FS.innerHTML = `
+    <div style="font-size:40px; margin-bottom:20px;">${title}</div>
+    <div style="margin-bottom:40px;">${text}</div>
+    <div id="cube" style="width:120px; height:120px; border:3px solid #7dd3fc;"></div>
+  `;
+  FS.style.display = "flex";
+  CUBE_ANIM();
+}
+
 
 }, 13000);
 </script>
