@@ -152,7 +152,134 @@ function updateScore(amount = 1){
 <div id="final-screen"></div>
 
 <script>
-/* GRID SYMBOLS */
+<!-- ⭐ ALLXALL AIR / AIV / XI / IX / X4 SYSTEM -->
+<script>
+
+/* ============================================================
+   1. START-SCREEN (3 MODI)
+   ============================================================ */
+
+const startScreen = document.createElement("div");
+startScreen.id = "start-screen";
+startScreen.style.cssText = `
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:#000; color:#7dd3fc; font-family:monospace;
+  display:flex; flex-direction:column; justify-content:center;
+  align-items:center; text-align:center; z-index:999999;
+  padding:20px; font-size:22px;
+`;
+
+startScreen.innerHTML = `
+  <div style="font-size:40px; margin-bottom:20px;">meKI · ALLXALL</div>
+
+  <button id="mode-score" style="margin:10px; padding:12px 20px;">Spiel‑Score‑Modus</button>
+  <button id="mode-info" style="margin:10px; padding:12px 20px;">Spiel‑Erklär‑Modus</button>
+  <button id="mode-contact" style="margin:10px; padding:12px 20px;">Spiel‑Kontakt‑Modus</button>
+
+  <div id="discord-box" style="margin-top:40px; font-size:18px; opacity:0.8;">
+    <div>──────────────</div>
+    <div id="discord-line">Discord: HIER DEINE ADRESSE</div>
+    <div>──────────────</div>
+  </div>
+`;
+
+document.body.appendChild(startScreen);
+
+/* ============================================================
+   2. START-SCREEN BUTTONS
+   ============================================================ */
+
+document.getElementById("mode-score").onclick = () => startGame("SCORE");
+document.getElementById("mode-info").onclick = () => startGame("INFO");
+document.getElementById("mode-contact").onclick = () => startGame("CONTACT");
+
+/* ============================================================
+   3. GAME STARTER
+   ============================================================ */
+
+function startGame(mode){
+  window.currentMode = mode;
+
+  // AIR / AIV Stabilisierung
+  AIR_AIV_Stabilize();
+
+  // Start-Screen ausblenden
+  startScreen.style.display = "none";
+
+  // Mode-spezifische Aktionen
+  if(mode === "INFO"){
+    alert("Erklär-Modus aktiviert.\nDas Spiel zeigt dir Hinweise und Tipps.");
+  }
+  if(mode === "CONTACT"){
+    alert("Kontakt-Modus aktiviert.\nDiscord-Adresse sichtbar.");
+  }
+}
+
+/* ============================================================
+   4. AIR / AIV / XI / IX / X4 Stabilisierung
+   ============================================================ */
+
+function AIR_AIV_Stabilize(){
+  console.log("ALLXALL AIR/AIV Stabilisierung aktiv — 360° Passagenkontrolle");
+
+  // 360° Fehlerblocker
+  window.onerror = function(){
+    console.log("AIR: Fehler abgefangen — Spiel bleibt stabil.");
+    return true;
+  };
+
+  // X4 Reset-Schutz
+  window.addEventListener("unhandledrejection", ()=>{
+    console.log("AIV: Promise-Fehler abgefangen.");
+  });
+}
+
+/* ============================================================
+   5. NEUSTART-TASTE
+   ============================================================ */
+
+const restartBtn = document.createElement("button");
+restartBtn.textContent = "NEUSTART";
+restartBtn.style.cssText = `
+  position:fixed; top:10px; right:10px;
+  background:#ffaa00; color:#000; padding:10px 20px;
+  border:none; border-radius:6px; z-index:999999;
+  cursor:pointer; font-weight:bold;
+`;
+restartBtn.onclick = resetGame;
+
+document.body.appendChild(restartBtn);
+
+/* ============================================================
+   6. GAME RESET
+   ============================================================ */
+
+function resetGame(){
+  console.log("ALLXALL RESET — X4 Stabilisierung");
+
+  // Score zurücksetzen
+  score = 0;
+  displayScore = 0;
+  document.getElementById("score").textContent = "Score: 0";
+
+  // Grid zurücksetzen
+  cells.forEach(c=>{
+    c.style.background = "#000";
+    c.style.transform = "scale(1)";
+  });
+
+  // Panels zurücksetzen
+  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+
+  // Start-Screen wieder anzeigen
+  startScreen.style.display = "flex";
+}
+
+</script>
+
+  
+  
+  /* GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
