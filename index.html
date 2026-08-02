@@ -5,73 +5,6 @@
 <title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
-  function RESET_AXIS_PANEL(){
-  const axisPanel = document.getElementById("axis-panel");
-  for(let i=0; i<axisPanel.children.length; i++){
-    const btn = axisPanel.children[i];
-    btn.style.background = "#0b1220";
-    btn.textContent = "A" + (i+1);
-  }
-}
-function RESET_SUPER_PANEL(){
-  const superPanel = document.getElementById("super-panel");
-  const names = ["Schach","Skat","Rommé","Jackpot","Domino","Combo","Bonus","Axiom","Orbit"];
-  for(let i=0; i<superPanel.children.length; i++){
-    const btn = superPanel.children[i];
-    btn.style.background = "#0b1220";
-    btn.textContent = names[i];
-  }
-}
-function RESET_GRID(){
-  cells.forEach(c=>{
-    c.style.background = "";
-    c.style.transform = "";
-    c.style.boxShadow = "";
-  });
-}
-function RESET_JACKPOT(){
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
-}
-function NEWGAME(){
-  RESET_FINAL();
-  RESET_SCORE();
-  RESET_GRID();
-  RESET_AXIS_PANEL();
-  RESET_SUPER_PANEL();
-  RESET_JACKPOT();
-}
-document.getElementById("newgame-btn").onclick = NEWGAME;
-
-document.addEventListener("click", e=>{
-  if(e.target.id === "final-newgame"){
-    NEWGAME();
-  }
-});
-function SCORE_RANK(){
-  let rank = Math.floor(100 + Math.random()*200);
-  return `Platz ${rank} · für das erste Mal sehr gut · stabile Achsenführung · Orbit sauber gehalten`;
-}
-const rating = SCORE_RANK();
-FS.innerHTML += `<div style="margin-top:20px; font-size:22px; color:#7dd3fc;">${rating}</div>`;
-
-  
-  
-  function RESET_FINAL(){
-  const FS = document.getElementById("final-screen");
-  FS.style.display = "none";
-  FS.innerHTML = "";
-  STOP_CUBE();
-}
-
-  
-  let cubeInterval = null;
-function STOP_CUBE(){
-  if(cubeInterval){
-    clearInterval(cubeInterval);
-    cubeInterval = null;
-  }
-}
-
 <style>
   body {
     background:#000;
@@ -156,6 +89,37 @@ function STOP_CUBE(){
     border-radius:6px;
     transition:.2s;
   }
+
+  #final-screen {
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:#000;
+    color:#7dd3fc;
+    font-family:monospace;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    z-index:999999;
+    padding:20px;
+    font-size:22px;
+  }
+
+  #newgame-btn {
+    position:fixed;
+    bottom:140px;
+    left:50%;
+    transform:translateX(-50%);
+    background:#0b1220;
+    color:#7dd3fc;
+    border:2px solid #7dd3fc;
+    padding:12px 20px;
+    border-radius:8px;
+    font-size:18px;
+    cursor:pointer;
+    z-index:99999;
+  }
 </style>
 </head>
 
@@ -165,17 +129,242 @@ function STOP_CUBE(){
 <div id="axis-panel"></div>
 <div id="super-panel"></div>
 <div id="jackpot-slot">Jackpot: —</div>
-
 <div id="grid"></div>
+<div id="final-screen"></div>
 
-<!-- ⭐ BLOCK 1: Dein altes Spiel (unverändert, funktioniert) -->
+<button id="newgame-btn">ORBIT · Neues Spiel</button>
+
 <script>
+
+/* ============================
+   SOUND ENGINE
+   ============================ */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+function playSound(freq = 440, duration = 0.15){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.frequency.value = freq;
+  osc.type = "sine";
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+
+/* ============================
+   SCORE ENGINE
+   ============================ */
+let score = 0;
+function updateScore(v=1){
+  score += v;
+  document.getElementById("score").textContent = "Score: " + score;
+  checkEnd();
+}
+
+function checkEnd(){
+  if(score >= 500){
+    FINAL("🎉 GAME OVER", "Du hast 500 Punkte erreicht!");
+  }
+}
+
+/* ============================
+   FINAL SCREEN
+   ============================ */
+function FINAL(title, text){
+  const FS = document.getElementById("final-screen");
+  FS.innerHTML = `
+    <div style="font-size:40px; margin-bottom:20px;">${title}</div>
+    <div style="margin-bottom:40px;">${text}</div>
+    <div id="cube" style="width:120px; height:120px; border:3px solid #7dd3fc;"></div>
+    <button id="final-newgame" style="
+      background:#0b1220;
+      color:#7dd3fc;
+      border:2px solid #7dd3fc;
+      padding:12px 20px;
+      border-radius:8px;
+      font-size:20px;
+      cursor:pointer;
+      margin-top:40px;
+    ">ORBIT · Neues Spiel</button>
+  `;
+
+  const rating = SCORE_RANK();
+  FS.innerHTML += `<div style="margin-top:20px; font-size:22px; color:#7dd3fc;">${rating}</div>`;
+
+  FS.style.display = "flex";
+  CUBE_ANIM();
+}
+
+/* ============================
+   CUBE ANIMATION
+   ============================ */
+let cubeInterval = null;
+function CUBE_ANIM(){
+  let deg = 0;
+  const cube = document.getElementById("cube");
+  clearInterval(cubeInterval);
+  cubeInterval = setInterval(()=>{
+    deg += 3;
+    cube.style.transform = `rotateY(${deg}deg) rotateX(${deg/2}deg)`;
+  }, 30);
+}
+
+/* ============================
+   GRID
+   ============================ */
+const symbols = [
+  "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
+  "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
+  "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
+  "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
+];
+
+const grid = document.getElementById("grid");
+const cells = [];
+
+for(let i=0;i<756;i++){
+  const cell = document.createElement("div");
+  cell.className = "cell";
+  cell.textContent = symbols[i % symbols.length];
+
+  cell.onclick = () => {
+    const deg = Math.floor(Math.random()*360);
+    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
+    cell.style.transform = "rotate(" + deg + "deg) scale(1.2)";
+    cell.style.background = col;
+    cell.style.boxShadow = "0 0 12px " + col;
+    setTimeout(()=>cell.style.transform="scale(1)",200);
+    updateScore();
+  };
+
+  grid.appendChild(cell);
+  cells.push(cell);
+}
+
+/* ============================
+   AXIS PANEL
+   ============================ */
+const axisPanel = document.getElementById("axis-panel");
+for(let a=0; a<27; a++){
+  const btn = document.createElement("button");
+  btn.textContent = "A" + (a+1);
+  btn.onclick = () => triggerAxis(a, btn);
+  axisPanel.appendChild(btn);
+}
+
+function triggerAxis(axis, btn){
+  const quality = Math.floor(Math.random()*3);
+  if(quality === 0){ btn.style.background = "yellow"; axisMoveNeutral(axis); }
+  if(quality === 1){ btn.style.background = "green"; axisMoveGood(axis); }
+  if(quality === 2){ btn.style.background = "red"; axisMoveBad(axis); }
+}
+
+function axisMoveNeutral(axis){
+  const start = axis * 28;
+  const end = start + 28;
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#333";
+  }
+}
+
+function axisMoveGood(axis){
+  const start = axis * 28;
+  const end = start + 28;
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#00aa00";
+    cells[i].style.transform = "scale(1.1)";
+  }
+  updateScore();
+}
+
+function axisMoveBad(axis){
+  const start = axis * 28;
+  const end = start + 28;
+  for(let i=start; i<end; i++){
+    cells[i].style.background = "#aa0000";
+    cells[i].style.transform = "rotate(10deg)";
+  }
+}
+
+/* ============================
+   SUPER PANEL
+   ============================ */
+const superPanel = document.getElementById("super-panel");
+const superNames = [
+  "Schach","Skat","Rommé",
+  "Jackpot","Domino","Combo",
+  "Bonus","Axiom","Orbit"
+];
+
+for(let i=0;i<9;i++){
+  const btn = document.createElement("button");
+  btn.textContent = superNames[i];
+  btn.onclick = () => triggerSuper(i);
+  superPanel.appendChild(btn);
+}
+
+function triggerSuper(i){
+  const r = Math.floor(Math.random()*4);
+  if(r === 0) superChess(i);
+  if(r === 1) superSkat(i);
+  if(r === 2) superRome(i);
+  if(r === 3) superJackpot(i);
+}
+
+function superChess(i){
+  const axis = Math.floor(Math.random()*27);
+  axisMoveGood(axis);
+  const pieces = ["König","Dame","Turm","Springer","Läufer"];
+  const piece = pieces[Math.floor(Math.random()*pieces.length)];
+  superPanel.children[i].textContent = "Schach: " + piece;
+  updateScore(4);
+}
+
+function superSkat(i){
+  const cards = ["♥","♦","♣","♠"];
+  const card = cards[Math.floor(Math.random()*cards.length)];
+  superPanel.children[i].textContent = "Skat: " + card;
+  updateScore(3);
+}
+
+function superRome(i){
+  const num = Math.floor(Math.random()*13)+1;
+  const col = ["red","blue","green"][Math.floor(Math.random()*3)];
+  superPanel.children[i].style.background = col;
+  superPanel.children[i].textContent = "Rommé: " + num;
+  updateScore(2);
+}
+
+function superJackpot(i){
+  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+  superPanel.children[i].textContent = "Jackpot: " + sym;
+  const hits = Math.floor(Math.random()*10)+1;
+  for(let h=0; h<hits; h++){
+    const cellIndex = Math.floor(Math.random()*756);
+    cells[cellIndex].style.background = "#ffaa00";
+    cells[cellIndex].style.transform = "scale(1.2)";
+  }
+  updateScore(hits * 5);
+  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
+  if(hits > 15){
+    FINAL("💥 JACKPOT‑OVERLOAD", "Zu viele Treffer!");
+  }
+}
+
+/* ============================
+   AUTO-FINALE
+   ============================ */
+setTimeout(()=>{
+  FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
+}, 13000);
+
 /* ============================
    PERFECT RESET ENGINE
    ============================ */
 
-/* Cube Animation Stop */
-let cubeInterval = null;
 function STOP_CUBE(){
   if(cubeInterval){
     clearInterval(cubeInterval);
@@ -183,7 +372,6 @@ function STOP_CUBE(){
   }
 }
 
-/* Final Screen Reset */
 function RESET_FINAL(){
   const FS = document.getElementById("final-screen");
   FS.style.display = "none";
@@ -191,13 +379,11 @@ function RESET_FINAL(){
   STOP_CUBE();
 }
 
-/* Score Reset */
 function RESET_SCORE(){
   score = 0;
   document.getElementById("score").textContent = "Score: 0";
 }
 
-/* Grid Reset */
 function RESET_GRID(){
   cells.forEach(c=>{
     c.style.background = "";
@@ -206,7 +392,6 @@ function RESET_GRID(){
   });
 }
 
-/* Axis Panel Reset */
 function RESET_AXIS_PANEL(){
   const axisPanel = document.getElementById("axis-panel");
   for(let i=0; i<axisPanel.children.length; i++){
@@ -216,7 +401,6 @@ function RESET_AXIS_PANEL(){
   }
 }
 
-/* Super Panel Reset */
 function RESET_SUPER_PANEL(){
   const superPanel = document.getElementById("super-panel");
   const names = ["Schach","Skat","Rommé","Jackpot","Domino","Combo","Bonus","Axiom","Orbit"];
@@ -227,18 +411,15 @@ function RESET_SUPER_PANEL(){
   }
 }
 
-/* Jackpot Reset */
 function RESET_JACKPOT(){
   document.getElementById("jackpot-slot").textContent = "Jackpot: —";
 }
 
-/* Score Bewertung */
 function SCORE_RANK(){
   let rank = Math.floor(100 + Math.random()*200);
   return `Platz ${rank} · für das erste Mal sehr gut · stabile Achsenführung · Orbit sauber gehalten`;
 }
 
-/* NEWGAME MASTER RESET */
 function NEWGAME(){
   RESET_FINAL();
   RESET_SCORE();
@@ -248,7 +429,6 @@ function NEWGAME(){
   RESET_JACKPOT();
 }
 
-/* Buttons aktivieren */
 document.getElementById("newgame-btn").onclick = NEWGAME;
 
 document.addEventListener("click", e=>{
@@ -256,7 +436,6 @@ document.addEventListener("click", e=>{
     NEWGAME();
   }
 });
-
 
 </script>
 
