@@ -308,47 +308,20 @@ document.body.addEventListener("click", ()=>{
   window.soundUnlocked = true;
 }, { once:true });
 
-/* ⭐ 7SINN SYSTEM */
-const sevenSinn = [
-  { name:"S1", color:"#ff4444", score:2, sound:liveSounds.explode[0] },
-  { name:"S2", color:"#ffaa00", score:3, sound:liveSounds.announce[0] },
-  { name:"S3", color:"#ffee33", score:4, sound:liveSounds.announce[1] },
-  { name:"S4", color:"#33ff33", score:5, sound:liveSounds.rise[0] },
-  { name:"S5", color:"#33bbff", score:6, sound:liveSounds.rise[1] },
-  { name:"S6", color:"#8833ff", score:7, sound:liveSounds.winloop[1] },
-  { name:"S7", color:"#ff33aa", score:10, sound:liveSounds.winloop[0] }
-];
-
-let sinnMode = 0;
-
+/* ⭐ META‑SYSTEM (7SINN unsichtbar) */
+let metaBoost = 1;
 setInterval(()=>{
-  sinnMode = (sinnMode + 1) % 7;
-
-  const mode = sevenSinn[sinnMode];
-
-  const scoreEl = document.getElementById("score");
-  scoreEl.style.textShadow = `0 0 20px ${mode.color}, 0 0 40px ${mode.color}`;
-
-  playFX(mode.sound, 0.35);
-
+  metaBoost = Math.floor(Math.random()*5)+1; // 1–5 Boost
 }, 1000);
 
-const oldCellClick = updateScore;
+const oldScore = updateScore;
 updateScore = function(amount = 1){
-  const mode = sevenSinn[sinnMode];
-  oldCellClick(amount * mode.score);
+  oldScore(amount * metaBoost);
 };
 
 const oldJackpotFX = triggerJackpotFX;
 triggerJackpotFX = function(){
-  const mode = sevenSinn[sinnMode];
-
-  document.getElementById("jackpot-slot").style.color = mode.color;
-
-  updateScore(mode.score * 20);
-
-  playFX(mode.sound, 0.65);
-
+  updateScore(metaBoost * 10);
   oldJackpotFX();
 };
 
