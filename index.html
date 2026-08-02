@@ -3,20 +3,19 @@
 
 /* 1. MODULE IMPORTS */
 import { loadAllRooms } from "./GateRoomLoader.js";
-import { meKI } from "./meKI.js";
 import { visualize2268 } from "./visualizer.js";
 import { TeamKernel } from "./team-kernel.js";
 
 /* 2. ALLXALL STARTER */
 async function ALLXALL_START(){
 
-    /* Räume laden */
+    // Räume laden
     const rooms = await loadAllRooms();
 
-    /* 2268-Achsen-Würfel erzeugen */
+    // 2268-Achsen-Würfel erzeugen
     visualize2268(rooms);
 
-    /* GA ↔ meKI ↔ MIE Team-Kernel starten */
+    // GA ↔ meKI ↔ MIE Team-Kernel starten
     TeamKernel();
 
     console.log("ALLXALL 360° — GA ↔ meKI ↔ MIE — 2268-Achsen-Würfel aktiv");
