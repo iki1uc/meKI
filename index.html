@@ -16,6 +16,28 @@ let gate = "GA";
 let axiomMode = "IN";
 let slide = 0;
 <script type="module">
+<script type="module">
+
+import { TeamKernel } from "./team-kernel.js";
+import { visualize756 } from "./visualizer.js";
+import { loadAllRooms } from "./GateRoomLoader.js";
+
+async function start(){
+
+    const rooms = await loadAllRooms();
+
+    // 1. 756-Achsen anzeigen
+    visualize756(rooms);
+
+    // 2. Team-Kernel starten
+    TeamKernel();
+
+    console.log("ALLXALL SYSTEM AKTIV — GA ↔ meKI ↔ MIE");
+}
+
+start();
+
+</script>
 
 import { TeamKernel } from "./team-kernel.js";
 import { visualize756 } from "./visualizer.js";
