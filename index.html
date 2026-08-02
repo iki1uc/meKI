@@ -128,52 +128,6 @@ const symbols = [
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
 ];
 
-/* ⭐ NOVOLINO – Euphorische Adaptive Sound Engine */
-const novolinoPool = {
-  mp3: [
-    "https://cdn.pixabay.com/download/audio/2022/03/15/audio_0f1e3b.mp3?filename=game-notification-113985.mp3",
-    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_6f1b1f.mp3?filename=arcade-melody-100575.mp3",
-    "https://cdn.pixabay.com/download/audio/2021/09/16/audio_5f1b1f.mp3?filename=arcade-win-100574.mp3"
-  ],
-  wav: [
-    "https://assets.mixkit.co/sfx/preview/mixkit-arcade-retro-game-over-213.wav",
-    "https://assets.mixkit.co/sfx/preview/mixkit-soft-ambient-tone-286.wav"
-  ],
-  aac: [
-    "https://cdn.pixabay.com/download/audio/2022/03/15/audio_0f1e3b.aac?filename=game-notification-113985.aac"
-  ]
-};
-
-/* ⭐ Fallback Loader: mp3 → aac → wav */
-function playNovolino(vol = 0.35){
-  let src = null;
-
-  if(novolinoPool.mp3.length) src = novolinoPool.mp3[Math.floor(Math.random()*novolinoPool.mp3.length)];
-  else if(novolinoPool.aac.length) src = novolinoPool.aac[Math.floor(Math.random()*novolinoPool.aac.length)];
-  else if(novolinoPool.wav.length) src = novolinoPool.wav[Math.floor(Math.random()*novolinoPool.wav.length)];
-
-  if(!src) return;
-
-  const audio = new Audio(src);
-  audio.volume = vol;
-  audio.play().catch(()=>{});
-}
-
-/* ⭐ Adaptive Euphoric Meta-Sound */
-setInterval(()=>{
-
-  // META‑Boost beeinflusst Euphorie
-  const boost = metaBoost; // 1–5
-
-  // AIR/AIV beeinflusst Intensität
-  const intensity = Math.min(1, boost / 5);
-
-  // Euphorischer Sound
-  playNovolino(0.25 + intensity * 0.15);
-
-}, 4000); // alle 4 Sekunden ein sanfter Euphorie‑Impuls
-
-  
 /* SCORE */
 let score = 0;
 function updateScore(){
