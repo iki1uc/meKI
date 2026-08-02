@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · System‑Zentrale</title>
+<title>meKI · Kernel‑Respo · Visual‑System</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -12,12 +12,13 @@
     font-family:monospace;
     margin:0;
     padding:0;
+    overflow:hidden;
   }
 
   header {
     text-align:center;
-    padding:25px 0;
-    font-size:34px;
+    padding:20px 0;
+    font-size:32px;
     color:#00eaff;
     text-shadow:0 0 12px #00eaff;
     border-bottom:1px solid #0a1a2a;
@@ -29,28 +30,22 @@
   }
 
   #left {
-    width:30%;
+    width:28%;
     border-right:1px solid #0a1a2a;
     padding:20px;
     overflow-y:auto;
   }
 
   #right {
-    width:70%;
+    width:72%;
     padding:20px;
-    overflow-y:auto;
-  }
-
-  h2 {
-    color:#00eaff;
-    margin-top:20px;
-    margin-bottom:10px;
+    overflow:hidden;
   }
 
   .module {
     border:1px solid #0a1a2a;
-    padding:12px;
-    margin-bottom:12px;
+    padding:10px;
+    margin-bottom:10px;
     background:#0b1220;
     border-radius:6px;
   }
@@ -67,56 +62,60 @@
     font-size:16px;
   }
 
-  #output {
-    margin-top:20px;
-    padding:15px;
+  #visual {
+    width:100%;
+    height:100%;
     background:#0b1220;
     border:1px solid #0a1a2a;
     border-radius:6px;
-    min-height:200px;
-    white-space:pre-wrap;
+    overflow:hidden;
+    position:relative;
+  }
+
+  canvas {
+    width:100%;
+    height:100%;
   }
 </style>
 </head>
 
 <body>
 
-<header>meKI · System‑Zentrale</header>
+<header>meKI · Kernel‑Respo · CORE‑Module</header>
 
 <div id="layout">
 
-  <!-- LEFT SIDE: MODULE LIST -->
+  <!-- LEFT SIDE -->
   <div id="left">
     <h2>Module</h2>
 
     <div class="module">RUN</div>
-    <div class="module">combo.js</div>
-    <div class="module">eco-shift.js</div>
     <div class="module">game.js</div>
-    <div class="module">gates.js</div>
-    <div class="module">mia-core.js</div>
-    <div class="module">mia-tribunal.js</div>
-    <div class="module">realitypulse.js</div>
     <div class="module">score.js</div>
-    <div class="module">tech.js</div>
-    <div class="module">tribunal.js</div>
-    <div class="module">wloch.js</div>
     <div class="module">SET.js</div>
     <div class="module">SETI.js</div>
-    <div class="module">SETI‑Reality.js</div>
     <div class="module">SET‑Pulse.js</div>
+    <div class="module">SETI‑Reality.js</div>
     <div class="module">cube.js</div>
-    <div class="module">meKI.js</div>
     <div class="module">team-kernel.js</div>
     <div class="module">visualizer.js</div>
+    <div class="module">meKI.js</div>
+    <div class="module">eco-shift.js</div>
+    <div class="module">combo.js</div>
+    <div class="module">tribunal.js</div>
+    <div class="module">mia-core.js</div>
+    <div class="module">mia-tribunal.js</div>
+    <div class="module">wloch.js</div>
 
     <button id="run">System starten</button>
   </div>
 
-  <!-- RIGHT SIDE: OUTPUT -->
+  <!-- RIGHT SIDE -->
   <div id="right">
-    <h2>System‑Output</h2>
-    <div id="output">Bereit…</div>
+    <h2>System‑Visualisierung</h2>
+    <div id="visual">
+      <canvas id="canvas"></canvas>
+    </div>
   </div>
 
 </div>
@@ -164,13 +163,16 @@ document.getElementById("run").onclick = () => {
     wloch: wloch()
   };
 
-  visualize2268(system);
+  // VISUALIZER
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
 
-  document.getElementById("output").textContent =
-    JSON.stringify(system, null, 2);
-};
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
 
-</script>
+  ctx.fillStyle = "#00111a";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
 
-</body>
-</html>
+  // simple visual: kernel pulses
+  let x = 0;
+  const
