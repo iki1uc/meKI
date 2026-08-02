@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>ECHO · Interstellar Signal System</title>
+<title>meKI · System‑Zentrale</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -16,28 +16,27 @@
 
   header {
     text-align:center;
-    padding:30px 0;
-    font-size:32px;
+    padding:25px 0;
+    font-size:34px;
     color:#00eaff;
     text-shadow:0 0 12px #00eaff;
     border-bottom:1px solid #0a1a2a;
   }
 
-  #container {
+  #layout {
     display:flex;
-    flex-direction:row;
     height:calc(100vh - 100px);
   }
 
   #left {
-    width:40%;
+    width:30%;
     border-right:1px solid #0a1a2a;
     padding:20px;
     overflow-y:auto;
   }
 
   #right {
-    width:60%;
+    width:70%;
     padding:20px;
     overflow-y:auto;
   }
@@ -50,19 +49,13 @@
 
   .module {
     border:1px solid #0a1a2a;
-    padding:15px;
-    margin-bottom:15px;
-    border-radius:6px;
+    padding:12px;
+    margin-bottom:12px;
     background:#0b1220;
+    border-radius:6px;
   }
 
-  .module pre {
-    white-space:pre-wrap;
-    font-size:14px;
-    color:#7dd3fc;
-  }
-
-  #run-btn {
+  #run {
     margin-top:20px;
     padding:12px 20px;
     background:#00eaff;
@@ -80,7 +73,7 @@
     background:#0b1220;
     border:1px solid #0a1a2a;
     border-radius:6px;
-    min-height:150px;
+    min-height:200px;
     white-space:pre-wrap;
   }
 </style>
@@ -88,26 +81,36 @@
 
 <body>
 
-<header>ECHO · Interstellar Signal System</header>
+<header>meKI · System‑Zentrale</header>
 
-<div id="container">
+<div id="layout">
 
-  <!-- LEFT SIDE: MODULE OVERVIEW -->
+  <!-- LEFT SIDE: MODULE LIST -->
   <div id="left">
     <h2>Module</h2>
 
-    <div class="module"><strong>CR.js</strong><br>Core‑Reflection</div>
-    <div class="module"><strong>Core.js</strong><br>Grundsignal‑Kern</div>
-    <div class="module"><strong>DSY.js</strong><br>Dynamische System‑Yield</div>
-    <div class="module"><strong>DO.js</strong><br>Direction‑Output</div>
-    <div class="module"><strong>EC.js</strong><br>Echo‑Cause</div>
-    <div class="module"><strong>ECHO.js</strong><br>Rückkehr‑Transformation</div>
-    <div class="module"><strong>HO.js</strong><br>Horizon‑Operator</div>
-    <div class="module"><strong>IT.js</strong><br>Identity‑Tick</div>
-    <div class="module"><strong>Dashboard.js</strong><br>Visualisierung</div>
-    <div class="module"><strong>PI.js</strong><br>Perfect Integration</div>
+    <div class="module">RUN</div>
+    <div class="module">combo.js</div>
+    <div class="module">eco-shift.js</div>
+    <div class="module">game.js</div>
+    <div class="module">gates.js</div>
+    <div class="module">mia-core.js</div>
+    <div class="module">mia-tribunal.js</div>
+    <div class="module">realitypulse.js</div>
+    <div class="module">score.js</div>
+    <div class="module">tech.js</div>
+    <div class="module">tribunal.js</div>
+    <div class="module">wloch.js</div>
+    <div class="module">SET.js</div>
+    <div class="module">SETI.js</div>
+    <div class="module">SETI‑Reality.js</div>
+    <div class="module">SET‑Pulse.js</div>
+    <div class="module">cube.js</div>
+    <div class="module">meKI.js</div>
+    <div class="module">team-kernel.js</div>
+    <div class="module">visualizer.js</div>
 
-    <button id="run-btn">System starten</button>
+    <button id="run">System starten</button>
   </div>
 
   <!-- RIGHT SIDE: OUTPUT -->
@@ -119,60 +122,54 @@
 </div>
 
 <script type="module">
-import { CR } from "./CR.js";
-import { Core } from "./Core.js";
-import { DSY } from "./DSY.js";
-import { DO } from "./DO.js";
-import { EC } from "./EC.js";
-import { ID_ECHO } from "./ECHO.js";
-import { HO } from "./HO.js";
-import { IT } from "./IT.js";
-import { Dashboard } from "./Dashboard.js";
-import { PI } from "./PI.js";
 
-document.getElementById("run-btn").onclick = () => {
+import { meKI } from "./meKI.js";
+import { TeamKernel } from "./team-kernel.js";
+import { visualize2268 } from "./visualizer.js";
+import { SET } from "./SET.js";
+import { SETI } from "./SETI.js";
+import { Pulse } from "./SET-Pulse.js";
+import { Reality } from "./SETI-Reality.js";
+import { scoreSystem } from "./score.js";
+import { gates } from "./gates.js";
+import { game } from "./game.js";
+import { ecoShift } from "./eco-shift.js";
+import { combo } from "./combo.js";
+import { cube } from "./cube.js";
+import { realityPulse } from "./realitypulse.js";
+import { tech } from "./tech.js";
+import { tribunal } from "./tribunal.js";
+import { miaCore } from "./mia-core.js";
+import { miaTribunal } from "./mia-tribunal.js";
+import { wloch } from "./wloch.js";
 
-  const pul = CR(1);
-  const ion = Core(2);
-  const mia = DO(3);
+document.getElementById("run").onclick = () => {
 
-  const echo = ID_ECHO(pul, ion, mia);
-  const dsy  = DSY(echo.value);
-  const ec   = EC(echo.value);
-  const ho   = HO(4);
-  const it   = IT(5);
-
-  const state = {
-    score: 0,
-    clicks: 0,
-    axisGood: 0,
-    axisBad: 0,
-    superHits: 0,
-    superClicks: 0,
-    jackpots: 0,
-    metaVariance: 0,
-    room: {
-      pre: [],
-      mid: { style:{ background:"#000" }},
-      post: [],
-      teamActive:false,
-      axisState:"neutral"
-    },
-    echo,
-    core: ion,
-    dsy,
-    do: mia,
-    ho,
-    it
+  const system = {
+    meKI: meKI(),
+    team: TeamKernel(),
+    cube: cube(),
+    gates: gates(),
+    game: game(),
+    score: scoreSystem(),
+    eco: ecoShift(),
+    combo: combo(),
+    pulse: Pulse(),
+    reality: Reality(),
+    realityPulse: realityPulse(),
+    tech: tech(),
+    tribunal: tribunal(),
+    miaCore: miaCore(),
+    miaTribunal: miaTribunal(),
+    wloch: wloch()
   };
 
-  const pi = PI(state);
-
-  Dashboard(pi);
+  visualize2268(system);
 
   document.getElementById("output").textContent =
-    JSON.stringify(pi, null, 2);
+    JSON.stringify(system, null, 2);
 };
+
 </script>
 
 </body>
