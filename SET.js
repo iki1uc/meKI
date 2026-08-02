@@ -1,4 +1,4 @@
-// SET.js (NEU)
+// SET.js 
 import { SETPulse } from "./SET-Pulse.js";
 import { SETIReality } from "./SETI-Reality.js";
 
@@ -15,5 +15,11 @@ export function SET(current, tick){
         mode
     };
 
+    return SETIReality.evaluate(meta);
+}
+// SETI.js 
+import { SETIReality } from "./SETI-Reality.js";
+
+export function SETI(meta){
     return SETIReality.evaluate(meta);
 }
