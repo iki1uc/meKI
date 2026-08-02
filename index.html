@@ -109,207 +109,60 @@ const symbols = [
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
   "✦","✧","✩","✪","✫","✬","✭","✮","✯","✰","✱","✲","✳","✴","✵","✶","✷","✸",
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
-];
+<!-- FINAL‑MODULE: GA/meKI/MIE · 756 · 2268 · ALLXALL · OUTRO -->
+<script>
+/* FINAL‑SCREEN */
+const FS = document.createElement("div");
+FS.id = "final-screen";
+FS.style.cssText = `
+  position:fixed; top:0; left:0; right:0; bottom:0;
+  background:#000; color:#7dd3fc; font-family:monospace;
+  display:none; justify-content:center; align-items:center;
+  flex-direction:column; text-align:center; z-index:999999;
+  padding:20px; font-size:22px;
+`;
+document.body.appendChild(FS);
 
-/* SCORE */
-let score = 0;
-function updateScore(){
-  score++;
-  document.getElementById("score").textContent = "Score: " + score;
+/* SHOW FINAL */
+function FINAL(title, text){
+  FS.innerHTML = `
+    <div style="font-size:40px; margin-bottom:20px;">${title}</div>
+    <div style="margin-bottom:40px;">${text}</div>
+    <div id="cube" style="width:120px; height:120px; border:3px solid #7dd3fc;"></div>
+  `;
+  FS.style.display = "flex";
+  CUBE_ANIM();
 }
 
-/* GRID */
-const grid = document.getElementById("grid");
-const cells = [];
-
-for(let i=0;i<756;i++){
-  const cell = document.createElement("div");
-  cell.className = "cell";
-  cell.textContent = symbols[i % symbols.length];
-
-  cell.onclick = () => {
-    const deg = Math.floor(Math.random()*360);
-    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
-
-    cell.style.transform = "rotate(" + deg + "deg)";
-    cell.style.background = col;
-
-    if(i % 2 === 0){
-      cell.style.border = "2px solid #66ffaa";
-    } else {
-      cell.style.border = "2px solid #ffaa66";
-    }
-
-    updateScore();
-  };
-
-  grid.appendChild(cell);
-  cells.push(cell);
+/* 3D‑Zauberwürfel‑Animation */
+function CUBE_ANIM(){
+  let deg = 0;
+  const cube = document.getElementById("cube");
+  setInterval(()=>{
+    deg += 3;
+    cube.style.transform = `rotateY(${deg}deg) rotateX(${deg/2}deg)`;
+  }, 30);
 }
 
-/* AXIS PANEL */
-const axisPanel = document.getElementById("axis-panel");
-
-for(let a=0; a<27; a++){
-  const btn = document.createElement("button");
-  btn.textContent = "A" + (a+1);
-
-  btn.onclick = () => triggerAxis(a, btn);
-
-  axisPanel.appendChild(btn);
+/* OUTRO MIT 9 BUCHSTABEN */
+function OUTRO(){
+  FINAL("MEKIMAGIC", "Danke fürs Spielen · Das Kontinuum schließt sich.");
 }
 
-function triggerAxis(axis, btn){
-  const quality = Math.floor(Math.random()*3);
+/* FINALE TRIGGER — 13 Sekunden */
+setTimeout(()=>{
 
-  if(quality === 0){
-    btn.style.background = "yellow";
-    axisMoveNeutral(axis);
-  }
-  if(quality === 1){
-    btn.style.background = "green";
-    axisMoveGood(axis);
-  }
-  if(quality === 2){
-    btn.style.background = "red";
-    axisMoveBad(axis);
-  }
-}
+  const r = Math.floor(Math.random()*5);
 
-function axisMoveNeutral(axis){
-  const start = axis * 28;
-  const end = start + 28;
+  if(r === 0) FINAL("GA · meKI · MIE", "Axiomisches Dreieck abgeschlossen.");
+  if(r === 1) FINAL("756‑Achsen‑Finale", "Magic‑Grid vollständig durchlaufen.");
+  if(r === 2) FINAL("2268‑Würfel‑Finale", "ALLXALL‑Kontinuum stabilisiert.");
+  if(r === 3) FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
+  if(r === 4) OUTRO();
 
-  for(let i=start; i<end; i++){
-    cells[i].style.background = "#333";
-  }
-}
-
-function axisMoveGood(axis){
-  const start = axis * 28;
-  const end = start + 28;
-
-  for(let i=start; i<end; i++){
-    cells[i].style.background = "#00aa00";
-    cells[i].style.transform = "scale(1.1)";
-  }
-
-  updateScore();
-}
-
-function axisMoveBad(axis){
-  const start = axis * 28;
-  const end = start + 28;
-
-  for(let i=start; i<end; i++){
-    cells[i].style.background = "#aa0000";
-    cells[i].style.transform = "rotate(10deg)";
-  }
-}
-
-/* SUPER PANEL */
-const superPanel = document.getElementById("super-panel");
-const superNames = [
-  "Schach","Skat","Rommé",
-  "Jackpot","Domino","Combo",
-  "Bonus","Axiom","Orbit"
-];
-
-for(let i=0;i<9;i++){
-  const btn = document.createElement("button");
-  btn.textContent = superNames[i];
-
-  btn.onclick = () => triggerSuper(i);
-
-  superPanel.appendChild(btn);
-}
-
-function triggerSuper(i){
-  const r = Math.floor(Math.random()*4);
-
-  if(r === 0) superChess(i);
-  if(r === 1) superSkat(i);
-  if(r === 2) superRome(i);
-  if(r === 3) superJackpot(i);
-}
-
-function superChess(i){
-  const axis = Math.floor(Math.random()*27);
-  axisMoveGood(axis);
-
-  const pieces = ["König","Dame","Turm","Springer","Läufer"];
-  const piece = pieces[Math.floor(Math.random()*pieces.length)];
-
-  superPanel.children[i].textContent = "Schach: " + piece;
-
-  score += 4;
-  updateScore();
-}
-
-function superSkat(i){
-  const cards = ["♥","♦","♣","♠"];
-  const card = cards[Math.floor(Math.random()*cards.length)];
-
-  superPanel.children[i].textContent = "Skat: " + card;
-
-  score += 3;
-  updateScore();
-}
-
-function superRome(i){
-  const num = Math.floor(Math.random()*13)+1;
-  const col = ["red","blue","green"][Math.floor(Math.random()*3)];
-
-  superPanel.children[i].style.background = col;
-  superPanel.children[i].textContent = "Rommé: " + num;
-
-  score += 2;
-  updateScore();
-}
-
-function superJackpot(i){
-  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
-  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
-
-  superPanel.children[i].textContent = "Jackpot: " + sym;
-
-  const hits = Math.floor(Math.random()*10)+1;
-
-  for(let h=0; h<hits; h++){
-    const cellIndex = Math.floor(Math.random()*756);
-    cells[cellIndex].style.background = "#ffaa00";
-    cells[cellIndex].style.transform = "scale(1.2)";
-  }
-
-  score += hits * 5;
-  updateScore();
-
-  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
-}
+}, 13000);
 </script>
 
-<!-- ⭐ BLOCK 2: ALLXALL-KERNEL (GA ↔ meKI ↔ MIE) -->
-<script type="module">
-
-import { loadAllRooms } from "./GateRoomLoader.js";
-import { meKI } from "./meKI.js";
-import { TeamKernel } from "./team-kernel.js";
-import { visualize2268 } from "./visualizer.js";
-
-async function ALLXALL_START(){
-
-    const rooms = await loadAllRooms();
-
-    visualize2268(rooms);
-
-    TeamKernel();
-
-    console.log("ALLXALL 360° — GA ↔ meKI ↔ MIE — 2268-Achsen-Würfel aktiv");
-}
-
-ALLXALL_START();
-
-</script>
 
 </body>
 </html>
