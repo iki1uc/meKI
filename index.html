@@ -115,7 +115,212 @@
 <div id="grid"></div>
 
 <script>
-/* SOUND ENGINE */
+export function OPTA(state){
+  return {
+    scoreRate: state.score / (state.clicks || 1),
+    axisQuality: state.axisGood - state.axisBad,
+    superEfficiency: state.superHits / (state.superClicks || 1),
+    jackpotChance: state.jackpots / (state.clicks || 1),
+    metaStability: 1 / (state.metaVariance + 1)
+  };
+}
+
+export function QI(room){
+  return {
+    midQuality: room.mid.style.background,
+    preQuality: room.pre.length,
+    postQuality: room.post.length,
+    teamActive: room.teamActive,
+    axisState: room.axisState
+  };
+}
+
+export function IQQ(opta, qi){
+  return {
+    stability: opta.metaStability * 0.7 + (qi.teamActive ? 0.3 : 0),
+    performance: opta.scoreRate * qi.preQuality,
+    resonance: opta.axisQuality * (qi.midQuality === "#000" ? 1 : 2),
+    synergy: opta.superEfficiency * qi.postQuality
+  };
+}
+
+export function PI(state){
+  const opta = OPTA(state);
+  const qi   = QI(state.room);
+  const iqq  = IQQ(opta, qi);
+
+  return {
+    identity: "∎ω",
+    opta,
+    qi,
+    iqq,
+    echo: state.echo,
+    core: state.core,
+    dsy: state.dsy,
+    do: state.do,
+    ho: state.ho,
+    it: state.it
+  };
+}
+function restartGame(){
+
+  /* SCORE */
+  score = 0;
+  displayScore = 0;
+  document.getElementById("score").textContent = "Score: 0";
+
+  /* JACKPOT */
+  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+
+  /* GRID */
+  cells.forEach(c=>{
+    c.style.background = "#000";
+    c.style.transform = "none";
+    c.style.border = "1px solid #1f2937";
+  });
+
+  /* PANELS */
+  [...axisPanel.children].forEach(btn=>{
+    btn.style.background = "#0b1220";
+  });
+
+  [...superPanel.children].forEach(btn=>{
+    btn.style.background = "#0b1220";
+    btn.textContent = btn.textContent.split(":")[0];
+  });
+
+  /* MITTELSTATION */
+  MID_tick = 0;
+  MID_gate = "GA";
+  MID_room = MID_rooms.GA;
+
+  /* RAUM-MATRIX (756 → pre/mid/post) */
+  const room = {
+    pre: cells.slice(0, 378),
+    mid: cells[378],
+    post: cells.slice(379),
+    teamActive: false,
+    axisState: "neutral"
+  };
+
+  /* STATE für OPTA/QI/IQQ/PI */
+  const state = {
+    score: 0,
+    clicks: 0,
+    axisGood: 0,
+    axisBad: 0,
+    superHits: 0,
+    superClicks: 0,
+    jackpots: 0,
+    metaVariance: 0,
+
+    room,
+    echo: null,
+    core: null,
+    dsy: null,
+    do: null,
+    ho: null,
+    it: null
+  };
+
+  /* PI-System neu berechnen */
+  const pi = PI(state);
+
+  console.log("OPTA:", pi.opta);
+  console.log("QI:", pi.qi);
+  console.log("IQQ:", pi.iqq);
+  console.log("PI:", pi);
+
+  /* FINAL-SCREEN */
+  document.getElementById("final-screen").style.display = "none";
+
+  console.log("NEUSTART: System + OPTA/QI/IQQ/PI vollständig zurückgesetzt.");
+}
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(freq = 440, duration = 0.15){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.frequency.value = freq;
+  osc.type = "sine";
+
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+let score = 0;
+
+function updateScore(v=1){
+  score += v;
+  document.getElementById("score").textContent = "Score: " + score;
+  checkEnd();
+}
+function checkEnd(){
+  if(score >= 500){
+    alert("🎉 GAME OVER — Du hast 500 Punkte erreicht!");
+    location.reload();
+  }
+}
+function checkGridEnd(){
+  let active = 0;
+  for(const c of cells){
+    if(c.style.background !== "") active++;
+  }
+  if(active > 600){
+    alert("🌀 Grid‑Overflow — Ende!");
+    location.reload();
+  }
+}
+function superJackpot(i){
+  const axiomSymbols = ["✦","✧","✪","✫","✬","✭"];
+  const sym = axiomSymbols[Math.floor(Math.random()*axiomSymbols.length)];
+
+  superPanel.children[i].textContent = "Jackpot: " + sym;
+
+  const hits = Math.floor(Math.random()*20)+5;
+
+  for(let h=0; h<hits; h++){
+    const cellIndex = Math.floor(Math.random()*756);
+    cells[cellIndex].style.background = "#ffaa00";
+    cells[cellIndex].style.transform = "scale(1.3)";
+    cells[cellIndex].style.boxShadow = "0 0 12px #ffaa00";
+  }
+
+  updateScore(hits * 3);
+
+  document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
+
+  if(hits > 15){
+    alert("💥 JACKPOT‑OVERLOAD — Spiel beendet!");
+    location.reload();
+  }
+}
+cell.onclick = () => {
+  const deg = Math.floor(Math.random()*360);
+  const col = "#" + Math.floor(Math.random()*16777215).toString(16);
+
+  cell.style.transform = "rotate(" + deg + "deg) scale(1.2)";
+  cell.style.background = col;
+  cell.style.boxShadow = "0 0 12px " + col;
+
+  setTimeout(()=>cell.style.transform="scale(1)",200);
+
+  updateScore();
+  checkGridEnd();
+};
+
+  
+  
+  
+  
+  
+  /* SOUND ENGINE */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSound(freq = 440, duration = 0.15){
