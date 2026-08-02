@@ -115,7 +115,72 @@
 <div id="grid"></div>
 
 <script>
-/* ⭐ GRID SYMBOLS */
+/* SOUND ENGINE */
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+function playSound(freq = 440, duration = 0.15){
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.frequency.value = freq;
+  osc.type = "sine";
+
+  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start();
+  osc.stop(audioCtx.currentTime + duration);
+}
+playSound(600);
+playSound(300);
+playSound(120);
+playSound(900);
+playSound(1200);
+playSound(1500);
+function checkEnd(){
+  if(score >= 500){
+    alert("🎉 GAME OVER — Du hast 500 Punkte erreicht!");
+    location.reload();
+  }
+}
+function updateScore(v=1){
+  score += v;
+  document.getElementById("score").textContent = "Score: " + score;
+  checkEnd();
+}
+function superJackpot(i){
+  // ... dein Jackpot Code ...
+
+  if(hits > 15){
+    alert("💥 JACKPOT‑OVERLOAD — Spiel beendet!");
+    location.reload();
+  }
+}
+setTimeout(()=>{
+  alert("⏳ Zeit vorbei!");
+  location.reload();
+}, 60000); // 60 Sekunden
+function checkGridEnd(){
+  let active = 0;
+  for(const c of cells){
+    if(c.style.background !== "") active++;
+  }
+  if(active > 600){
+    alert("🌀 Grid‑Overflow — Ende!");
+    location.reload();
+  }
+}
+cell.onclick = () => {
+  // dein Klickcode
+  checkGridEnd();
+};
+
+  
+  
+  /* ⭐ GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
