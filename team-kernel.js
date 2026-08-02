@@ -26,7 +26,6 @@ export async function TeamKernel(){
 
         console.log("TEAM-KERNEL:", calc);
 
-        // WLOCH-Routing
         if(calc.pulse.soll === 1) currentRoom = rooms.GA;
         if(calc.pulse.soll === 2) currentRoom = rooms.meKI;
         if(calc.pulse.soll === 3) currentRoom = rooms.MIE;
