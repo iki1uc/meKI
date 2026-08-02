@@ -1,19 +1,32 @@
-// SETI-Reality.js (NEU)
-export const SETIReality = {
+// RealityPulse.js (NEU · FINAL)
+import { SETPulse } from "./SET-Pulse.js";
+import { SETIReality } from "./SETI-Reality.js";
 
-    evaluate(meta){
-        const score =
-            (meta.tech.ix + meta.tech.xi + meta.tech.x4) *
-            (meta.mode === "ALL-IN" ? 2 : 1);
+export function RealityPulse(current, tick){
 
-        return {
-            axis: meta.axis,
-            mode: meta.mode,
-            ix: meta.tech.ix,
-            xi: meta.tech.xi,
-            x4: meta.tech.x4,
-            score,
-            verdict: score > 20 ? "POSITIV" : "NEUTRAL"
-        };
-    }
-};
+    const soll = SETPulse.next(current.ist);
+
+    const pulse = {
+        gate: current.gate,
+        ist: current.ist,
+        soll
+    };
+
+    const tech = SETPulse.tech(tick);
+    const mode = SETPulse.mode(tick);
+
+    const meta = {
+        axis: SETPulse.axis,
+        pulse,
+        tech,
+        mode
+    };
+
+    const eval = SETIReality.evaluate(meta);
+
+    return {
+        pulse,
+        meta,
+        eval
+    };
+}
