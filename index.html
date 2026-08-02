@@ -14,6 +14,52 @@ function restartGame(){
     c.style.border = "1px solid #1f2937";
   });
 
+export function OPTA(state){
+  return {
+    scoreRate: state.score / state.clicks,
+    axisQuality: state.axisGood - state.axisBad,
+    superEfficiency: state.superHits / state.superClicks,
+    jackpotChance: state.jackpots / state.clicks,
+    metaStability: 1 / (state.metaVariance + 1)
+  };
+}
+export function QI(room){
+  return {
+    midQuality: room.mid.style.background,
+    preQuality: room.pre.length,
+    postQuality: room.post.length,
+    teamActive: room.teamActive,
+    axisState: room.axisState
+  };
+}
+export function IQQ(opta, qi){
+  return {
+    stability: opta.metaStability * 0.7 + qi.teamActive * 0.3,
+    performance: opta.scoreRate * qi.preQuality,
+    resonance: opta.axisQuality * qi.midQuality,
+    synergy: opta.superEfficiency * qi.postQuality
+  };
+}
+export function PI(state){
+  const opta = OPTA(state);
+  const qi = QI(state.room);
+  const iqq = IQQ(opta, qi);
+
+  return {
+    identity: "∎ω",
+    opta,
+    qi,
+    iqq,
+    echo: state.echo,
+    core: state.core,
+    dsy: state.dsy,
+    do: state.do,
+    ho: state.ho,
+    it: state.it
+  };
+}
+
+
   // Axis-Panel zurücksetzen
   [...axisPanel.children].forEach(btn=>{
     btn.style.background = "#0b1220";
