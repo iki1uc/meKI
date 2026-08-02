@@ -2,7 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="utf-8">
-<title>meKI · 756 NC‑Magic Grid · GRANDIOS</title>
+<title>meKI · 756 NC‑Magic Grid</title>
 <meta name="viewport" content="width=device-width,initial-scale=1">
 
 <style>
@@ -19,11 +19,10 @@
     top:0;
     left:50%;
     transform:translateX(-50%);
-    color:#00eaff;
-    font-size:22px;
+    color:#7dd3fc;
+    font-size:20px;
     padding:10px;
     z-index:99999;
-    text-shadow:0 0 12px #00eaff;
   }
 
   #grid {
@@ -34,7 +33,6 @@
     grid-template-rows:repeat(28, 1fr);
     gap:3px;
     padding:10px;
-    overflow:auto; /* ⭐ WICHTIG – sonst zeigt Browser nur Text */
   }
 
   .cell {
@@ -43,12 +41,8 @@
     justify-content:center;
     align-items:center;
     font-size:18px;
-    transition:transform .25s ease, background .25s ease, box-shadow .25s ease;
+    transition:transform .4s ease, background .4s ease;
     cursor:pointer;
-  }
-
-  .cell:hover {
-    box-shadow:0 0 12px #00eaff;
   }
 
   #axis-panel {
@@ -62,7 +56,7 @@
     align-items:center;
     gap:6px;
     background:#000;
-    border-top:2px solid #00eaff;
+    border-top:2px solid #7dd3fc;
     z-index:99999;
   }
 
@@ -82,14 +76,13 @@
     left:50%;
     transform:translateX(-50%);
     color:#ffaa00;
-    font-size:28px;
-    text-shadow:0 0 12px #ffaa00;
+    font-size:26px;
     z-index:99999;
   }
 
   button {
     background:#0b1220;
-    color:#00eaff;
+    color:#7dd3fc;
     border:1px solid #1f2937;
     padding:10px 14px;
     cursor:pointer;
@@ -97,10 +90,21 @@
     transition:.2s;
   }
 
-  button:hover {
-    background:#00eaff;
-    color:#000;
-    box-shadow:0 0 12px #00eaff;
+  /* FINAL SCREEN */
+  #final-screen {
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:#000;
+    color:#7dd3fc;
+    font-family:monospace;
+    display:none;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    text-align:center;
+    z-index:999999;
+    padding:20px;
+    font-size:22px;
   }
 </style>
 </head>
@@ -113,129 +117,9 @@
 <div id="jackpot-slot">Jackpot: —</div>
 
 <div id="grid"></div>
+<div id="final-screen"></div>
 
 <script>
-export function OPTA(state){
-  return {
-    scoreRate: state.score / (state.clicks || 1),
-    axisQuality: state.axisGood - state.axisBad,
-    superEfficiency: state.superHits / (state.superClicks || 1),
-    jackpotChance: state.jackpots / (state.clicks || 1),
-    metaStability: 1 / (state.metaVariance + 1)
-  };
-}
-
-export function QI(room){
-  return {
-    midQuality: room.mid.style.background,
-    preQuality: room.pre.length,
-    postQuality: room.post.length,
-    teamActive: room.teamActive,
-    axisState: room.axisState
-  };
-}
-
-export function IQQ(opta, qi){
-  return {
-    stability: opta.metaStability * 0.7 + (qi.teamActive ? 0.3 : 0),
-    performance: opta.scoreRate * qi.preQuality,
-    resonance: opta.axisQuality * (qi.midQuality === "#000" ? 1 : 2),
-    synergy: opta.superEfficiency * qi.postQuality
-  };
-}
-
-export function PI(state){
-  const opta = OPTA(state);
-  const qi   = QI(state.room);
-  const iqq  = IQQ(opta, qi);
-
-  return {
-    identity: "∎ω",
-    opta,
-    qi,
-    iqq,
-    echo: state.echo,
-    core: state.core,
-    dsy: state.dsy,
-    do: state.do,
-    ho: state.ho,
-    it: state.it
-  };
-}
-function restartGame(){
-
-  /* SCORE */
-  score = 0;
-  displayScore = 0;
-  document.getElementById("score").textContent = "Score: 0";
-
-  /* JACKPOT */
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
-
-  /* GRID */
-  cells.forEach(c=>{
-    c.style.background = "#000";
-    c.style.transform = "none";
-    c.style.border = "1px solid #1f2937";
-  });
-
-  /* PANELS */
-  [...axisPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-  });
-
-  [...superPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-    btn.textContent = btn.textContent.split(":")[0];
-  });
-
-  /* MITTELSTATION */
-  MID_tick = 0;
-  MID_gate = "GA";
-  MID_room = MID_rooms.GA;
-
-  /* RAUM-MATRIX (756 → pre/mid/post) */
-  const room = {
-    pre: cells.slice(0, 378),
-    mid: cells[378],
-    post: cells.slice(379),
-    teamActive: false,
-    axisState: "neutral"
-  };
-
-  /* STATE für OPTA/QI/IQQ/PI */
-  const state = {
-    score: 0,
-    clicks: 0,
-    axisGood: 0,
-    axisBad: 0,
-    superHits: 0,
-    superClicks: 0,
-    jackpots: 0,
-    metaVariance: 0,
-
-    room,
-    echo: null,
-    core: null,
-    dsy: null,
-    do: null,
-    ho: null,
-    it: null
-  };
-
-  /* PI-System neu berechnen */
-  const pi = PI(state);
-
-  console.log("OPTA:", pi.opta);
-  console.log("QI:", pi.qi);
-  console.log("IQQ:", pi.iqq);
-  console.log("PI:", pi);
-
-  /* FINAL-SCREEN */
-  document.getElementById("final-screen").style.display = "none";
-
-  console.log("NEUSTART: System + OPTA/QI/IQQ/PI vollständig zurückgesetzt.");
-}
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
 function playSound(freq = 440, duration = 0.15){
@@ -317,75 +201,7 @@ cell.onclick = () => {
 
   
   
-  
-  
-  
-  /* SOUND ENGINE */
-const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-
-function playSound(freq = 440, duration = 0.15){
-  const osc = audioCtx.createOscillator();
-  const gain = audioCtx.createGain();
-
-  osc.frequency.value = freq;
-  osc.type = "sine";
-
-  gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-
-  osc.connect(gain);
-  gain.connect(audioCtx.destination);
-
-  osc.start();
-  osc.stop(audioCtx.currentTime + duration);
-}
-playSound(600);
-playSound(300);
-playSound(120);
-playSound(900);
-playSound(1200);
-playSound(1500);
-function checkEnd(){
-  if(score >= 500){
-    alert("🎉 GAME OVER — Du hast 500 Punkte erreicht!");
-    location.reload();
-  }
-}
-function updateScore(v=1){
-  score += v;
-  document.getElementById("score").textContent = "Score: " + score;
-  checkEnd();
-}
-function superJackpot(i){
-  // ... dein Jackpot Code ...
-
-  if(hits > 15){
-    alert("💥 JACKPOT‑OVERLOAD — Spiel beendet!");
-    location.reload();
-  }
-}
-setTimeout(()=>{
-  alert("⏳ Zeit vorbei!");
-  location.reload();
-}, 60000); // 60 Sekunden
-function checkGridEnd(){
-  let active = 0;
-  for(const c of cells){
-    if(c.style.background !== "") active++;
-  }
-  if(active > 600){
-    alert("🌀 Grid‑Overflow — Ende!");
-    location.reload();
-  }
-}
-cell.onclick = () => {
-  // dein Klickcode
-  checkGridEnd();
-};
-
-  
-  
-  /* ⭐ GRID SYMBOLS */
+  /* GRID SYMBOLS */
 const symbols = [
   "▲","▼","◄","►","◆","◇","○","●","■","□","✦","✧","✪","✫","✬","✭","✮","✯",
   "☀","☾","⊕","⚑","⚐","⚙","✹","✸","✶","✷","✳","✴","✱","✲","✢","✣","✤","✥",
@@ -393,40 +209,9 @@ const symbols = [
   "✹","✺","✻","✼","✽","✾","✿","❀","❁","❂","❃","❄","❅","❆","❇","❈","❉","❊"
 ];
 
-/* ⭐ SCORE */
-let score = 0;
-function updateScore(v=1){
-  score += v;
-  document.getElementById("score").textContent = "Score: " + score;
-}
 
-/* ⭐ GRID */
-const grid = document.getElementById("grid");
-const cells = [];
 
-for(let i=0;i<756;i++){
-  const cell = document.createElement("div");
-  cell.className = "cell";
-  cell.textContent = symbols[i % symbols.length];
-
-  cell.onclick = () => {
-    const deg = Math.floor(Math.random()*360);
-    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
-
-    cell.style.transform = "rotate(" + deg + "deg) scale(1.2)";
-    cell.style.background = col;
-    cell.style.boxShadow = "0 0 12px " + col;
-
-    setTimeout(()=>cell.style.transform="scale(1)",200);
-
-    updateScore();
-  };
-
-  grid.appendChild(cell);
-  cells.push(cell);
-}
-
-/* ⭐ AXIS PANEL */
+/* AXIS PANEL */
 const axisPanel = document.getElementById("axis-panel");
 
 for(let a=0; a<27; a++){
@@ -461,7 +246,6 @@ function axisMoveNeutral(axis){
 
   for(let i=start; i<end; i++){
     cells[i].style.background = "#333";
-    cells[i].style.boxShadow = "none";
   }
 }
 
@@ -471,11 +255,10 @@ function axisMoveGood(axis){
 
   for(let i=start; i<end; i++){
     cells[i].style.background = "#00aa00";
-    cells[i].style.transform = "scale(1.2)";
-    cells[i].style.boxShadow = "0 0 12px #00ff00";
+    cells[i].style.transform = "scale(1.1)";
   }
 
-  updateScore(5);
+  updateScore();
 }
 
 function axisMoveBad(axis){
@@ -485,13 +268,10 @@ function axisMoveBad(axis){
   for(let i=start; i<end; i++){
     cells[i].style.background = "#aa0000";
     cells[i].style.transform = "rotate(10deg)";
-    cells[i].style.boxShadow = "0 0 12px #ff0000";
   }
-
-  updateScore(3);
 }
 
-/* ⭐ SUPER PANEL */
+/* SUPER PANEL */
 const superPanel = document.getElementById("super-panel");
 const superNames = [
   "Schach","Skat","Rommé",
@@ -526,7 +306,8 @@ function superChess(i){
 
   superPanel.children[i].textContent = "Schach: " + piece;
 
-  updateScore(10);
+  score += 4;
+  updateScore();
 }
 
 function superSkat(i){
@@ -535,7 +316,8 @@ function superSkat(i){
 
   superPanel.children[i].textContent = "Skat: " + card;
 
-  updateScore(8);
+  score += 3;
+  updateScore();
 }
 
 function superRome(i){
@@ -545,7 +327,8 @@ function superRome(i){
   superPanel.children[i].style.background = col;
   superPanel.children[i].textContent = "Rommé: " + num;
 
-  updateScore(6);
+  score += 2;
+  updateScore();
 }
 
 function superJackpot(i){
@@ -554,19 +337,59 @@ function superJackpot(i){
 
   superPanel.children[i].textContent = "Jackpot: " + sym;
 
-  const hits = Math.floor(Math.random()*20)+5;
+  const hits = Math.floor(Math.random()*10)+1;
 
   for(let h=0; h<hits; h++){
     const cellIndex = Math.floor(Math.random()*756);
     cells[cellIndex].style.background = "#ffaa00";
-    cells[cellIndex].style.transform = "scale(1.3)";
-    cells[cellIndex].style.boxShadow = "0 0 12px #ffaa00";
+    cells[cellIndex].style.transform = "scale(1.2)";
   }
 
-  updateScore(hits * 3);
+  score += hits * 5;
+  updateScore();
 
   document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
 }
+
+/* FINAL‑SCREEN */
+function FINAL(title, text){
+  const FS = document.getElementById("final-screen");
+  FS.innerHTML = `
+    <div style="font-size:40px; margin-bottom:20px;">${title}</div>
+    <div style="margin-bottom:40px;">${text}</div>
+    <div id="cube" style="width:120px; height:120px; border:3px solid #7dd3fc;"></div>
+  `;
+  FS.style.display = "flex";
+  CUBE_ANIM();
+}
+
+/* 3D‑Zauberwürfel‑Animation */
+function CUBE_ANIM(){
+  let deg = 0;
+  const cube = document.getElementById("cube");
+  setInterval(()=>{
+    deg += 3;
+    cube.style.transform = `rotateY(${deg}deg) rotateX(${deg/2}deg)`;
+  }, 30);
+}
+
+/* OUTRO MIT 9 BUCHSTABEN */
+function OUTRO(){
+  FINAL("MEKIMAGIC", "Danke fürs Spielen · Das Kontinuum schließt sich.");
+}
+
+/* FINALE TRIGGER — 13 Sekunden */
+setTimeout(()=>{
+
+  const r = Math.floor(Math.random()*5);
+
+  if(r === 0) FINAL("GA · meKI · MIE", "Axiomisches Dreieck abgeschlossen.");
+  if(r === 1) FINAL("756‑Achsen‑Finale", "Magic‑Grid vollständig durchlaufen.");
+  if(r === 2) FINAL("2268‑Würfel‑Finale", "ALLXALL‑Kontinuum stabilisiert.");
+  if(r === 3) FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
+  if(r === 4) OUTRO();
+
+}, 13000);
 </script>
 
 </body>
