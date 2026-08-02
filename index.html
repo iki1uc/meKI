@@ -1,196 +1,28 @@
-import { addCombo, executeCombo } from "./combo.js";
-import { applyColorRules } from "./score.js";
-import { nextGate, orbitGate } from "./gates.js";
-import { techPulse } from "./tech.js";
-import { RealityPulse } from "./realitypulse.js";
-import { MIATribunal } from "./mia-tribunal.js";
-import { stabiliseRoom } from "./wloch.js";
-import { ecoShift } from "./eco-shift.js";
+<!-- FINAL ALLXALL 2268-ACHSEN INDEX.HTML -->
+<script type="module">
+
+/* 1. MODULE IMPORTS */
 import { loadAllRooms } from "./GateRoomLoader.js";
-
-/* TEAM-WORK META */
-let turns = 0;
-let score = 0;
-let tick = 0;
-let gate = "GA";
-let axiomMode = "IN";
-let slide = 0;
-<script type="module">
-<script type="module">
-<script type="module">
-
-import { TeamKernel } from "./team-kernel.js";
+import { meKI } from "./meKI.js";
 import { visualize2268 } from "./visualizer.js";
-import { loadAllRooms } from "./GateRoomLoader.js";
+import { TeamKernel } from "./team-kernel.js";
 
-async function start(){
+/* 2. ALLXALL STARTER */
+async function ALLXALL_START(){
 
+    /* Räume laden */
     const rooms = await loadAllRooms();
 
+    /* 2268-Achsen-Würfel erzeugen */
     visualize2268(rooms);
 
+    /* GA ↔ meKI ↔ MIE Team-Kernel starten */
     TeamKernel();
 
     console.log("ALLXALL 360° — GA ↔ meKI ↔ MIE — 2268-Achsen-Würfel aktiv");
 }
 
-start();
+/* 3. START */
+ALLXALL_START();
 
 </script>
-
-import { TeamKernel } from "./team-kernel.js";
-import { visualize756 } from "./visualizer.js";
-import { loadAllRooms } from "./GateRoomLoader.js";
-
-async function start(){
-
-    const rooms = await loadAllRooms();
-
-    // 1. 756-Achsen anzeigen
-    visualize756(rooms);
-
-    // 2. Team-Kernel starten
-    TeamKernel();
-
-    console.log("ALLXALL SYSTEM AKTIV — GA ↔ meKI ↔ MIE");
-}
-
-start();
-
-</script>
-
-import { TeamKernel } from "./team-kernel.js";
-import { visualize756 } from "./visualizer.js";
-import { loadAllRooms } from "./GateRoomLoader.js";
-
-async function start(){
-
-    const rooms = await loadAllRooms();
-
-    visualize756(rooms);
-
-    TeamKernel();
-
-    console.log("ALLXALL SYSTEM AKTIV — GA ↔ meKI ↔ MIE");
-}
-
-start();
-
-</script>
-
-/* ROOM POINTER */
-let rooms = {};
-let currentRoom = null;
-
-/* INIT: rooms zuerst laden */
-export async function initGame(){
-
-    rooms = await loadAllRooms();
-
-    // Startpunkt
-    currentRoom = rooms.GA;
-
-    console.log("GAME STARTED:", currentRoom);
-}
-
-/* SLIDE-3 AXIOM SYSTEM */
-function slideAxiom(){
-    slide++;
-
-    if(slide % 3 === 1) axiomMode = "IN";
-    if(slide % 3 === 2) axiomMode = "OUT";
-    if(slide % 3 === 0) axiomMode = "IO";
-
-    console.log("AXIOM-MODE:", axiomMode);
-}
-
-/* UNTERE BUTTONS → KEINE KOSTEN */
-export function onLowerButton(action){
-    addCombo(action);
-}
-
-/* AUSFÜHRENDE INSTANZ → ALLES = EIN ZUG */
-export function onExecute(){
-
-    if(!currentRoom){
-        console.error("Rooms not loaded yet!");
-        return;
-    }
-
-    turns++;
-
-    /* 1. Combo ausführen */
-    const comboResult = executeCombo();
-
-    /* 2. Farben-Regeln */
-    score = applyColorRules(comboResult, score, turns);
-
-    /* 3. 3-RESPO-GATEN */
-    gate = nextGate(gate);
-
-    /* 4. ALLXALL-Orbit */
-    gate = orbitGate(turns);
-
-    /* 5. 756-Achsen Tech */
-    const tech = techPulse(tick);
-
-    /* 6. WLOCH-Pulse */
-    const pulse = stabiliseRoom(currentRoom);
-
-    /* 7. RealityPulse */
-    const reality = RealityPulse(currentRoom, tick);
-
-    /* 8. MIA-TRIBUNAL */
-    const verdict = MIATribunal({
-        pulse,
-        tech,
-        mode: reality.meta.mode,
-        score,
-        turns,
-        gate,
-        axiomMode,
-        slide
-    });
-<script type="module">
-
-import { TeamKernel } from "./team-kernel.js";
-import { visualize756 } from "./visualizer.js";
-import { loadAllRooms } from "./GateRoomLoader.js";
-
-async function start(){
-
-    const rooms = await loadAllRooms();
-
-    // 1. 756-Achsen anzeigen
-    visualize756(rooms);
-
-    // 2. Team-Kernel starten
-    TeamKernel();
-
-    console.log("AXIOMISCHES DREIECK GA–meKI–MIE AKTIV");
-}
-
-start();
-
-</script>
-
-    console.log("GAME-VERDICT:", verdict);
-
-    /* 9. ECO-3D SHIFT */
-    ecoShift(reality);
-
-    /* 10. ROOM ROUTING */
-    if(pulse.soll === 2) currentRoom = rooms.meKI;
-    if(pulse.soll === 3) currentRoom = rooms.MIE;
-    if(pulse.soll === 1) currentRoom = rooms.GA;
-
-    /* 11. SLIDE-3 AXIOM */
-    slideAxiom();
-
-    tick++;
-
-    /* 12. SPIELENDE */
-    if(turns >= 13){
-        endGame(verdict);
-    }
-}
