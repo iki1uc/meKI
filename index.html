@@ -1,108 +1,146 @@
-function restartGame(){
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<title>ECHO · Interstellar Signal System</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-  // Score zurücksetzen
-  score = 0;
-  document.getElementById("score").textContent = "Score: 0";
+<style>
+  body {
+    background:#000;
+    color:#7dd3fc;
+    font-family:monospace;
+    margin:0;
+    padding:0;
+  }
 
-  // Jackpot zurücksetzen
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+  header {
+    text-align:center;
+    padding:30px 0;
+    font-size:32px;
+    color:#00eaff;
+    text-shadow:0 0 12px #00eaff;
+    border-bottom:1px solid #0a1a2a;
+  }
 
-  // Grid zurücksetzen
-  cells.forEach(c=>{
-    c.style.background = "#000";
-    c.style.transform = "none";
-    c.style.border = "1px solid #1f2937";
-  });
+  #container {
+    display:flex;
+    flex-direction:row;
+    height:calc(100vh - 100px);
+  }
 
-export function OPTA(state){
-  return {
-    scoreRate: state.score / state.clicks,
-    axisQuality: state.axisGood - state.axisBad,
-    superEfficiency: state.superHits / state.superClicks,
-    jackpotChance: state.jackpots / state.clicks,
-    metaStability: 1 / (state.metaVariance + 1)
-  };
-}
-export function QI(room){
-  return {
-    midQuality: room.mid.style.background,
-    preQuality: room.pre.length,
-    postQuality: room.post.length,
-    teamActive: room.teamActive,
-    axisState: room.axisState
-  };
-}
-export function IQQ(opta, qi){
-  return {
-    stability: opta.metaStability * 0.7 + qi.teamActive * 0.3,
-    performance: opta.scoreRate * qi.preQuality,
-    resonance: opta.axisQuality * qi.midQuality,
-    synergy: opta.superEfficiency * qi.postQuality
-  };
-}
-export function PI(state){
-  const opta = OPTA(state);
-  const qi = QI(state.room);
-  const iqq = IQQ(opta, qi);
+  #left {
+    width:40%;
+    border-right:1px solid #0a1a2a;
+    padding:20px;
+    overflow-y:auto;
+  }
 
-  return {
-    identity: "∎ω",
-    opta,
-    qi,
-    iqq,
-    echo: state.echo,
-    core: state.core,
-    dsy: state.dsy,
-    do: state.do,
-    ho: state.ho,
-    it: state.it
-  };
-}
-function restartGame(){
+  #right {
+    width:60%;
+    padding:20px;
+    overflow-y:auto;
+  }
 
-  /* -----------------------------------------
-     1 · SCORE & JACKPOT
-  ----------------------------------------- */
-  score = 0;
-  displayScore = 0;
-  document.getElementById("score").textContent = "Score: 0";
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
+  h2 {
+    color:#00eaff;
+    margin-top:20px;
+    margin-bottom:10px;
+  }
 
+  .module {
+    border:1px solid #0a1a2a;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:6px;
+    background:#0b1220;
+  }
 
-  /* -----------------------------------------
-     2 · GRID (756 Raum)
-  ----------------------------------------- */
-  cells.forEach(c=>{
-    c.style.background = "#000";
-    c.style.transform = "none";
-    c.style.border = "1px solid #1f2937";
-  });
+  .module pre {
+    white-space:pre-wrap;
+    font-size:14px;
+    color:#7dd3fc;
+  }
 
+  #run-btn {
+    margin-top:20px;
+    padding:12px 20px;
+    background:#00eaff;
+    color:#000;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+    font-size:16px;
+  }
 
-  /* -----------------------------------------
-     3 · PANELS
-  ----------------------------------------- */
-  [...axisPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-  });
+  #output {
+    margin-top:20px;
+    padding:15px;
+    background:#0b1220;
+    border:1px solid #0a1a2a;
+    border-radius:6px;
+    min-height:150px;
+    white-space:pre-wrap;
+  }
+</style>
+</head>
 
-  [...superPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-    btn.textContent = btn.textContent.split(":")[0];
-  });
+<body>
 
+<header>ECHO · Interstellar Signal System</header>
 
-  /* -----------------------------------------
-     4 · MITTELSTATION
-  ----------------------------------------- */
-  MID_tick = 0;
-  MID_gate = "GA";
-  MID_room = MID_rooms.GA;
+<div id="container">
 
+  <!-- LEFT SIDE: MODULE OVERVIEW -->
+  <div id="left">
+    <h2>Module</h2>
 
-  /* -----------------------------------------
-     5 · OPTA / QI / IQQ / PI — SYSTEM RESET
-  ----------------------------------------- */
+    <div class="module"><strong>CR.js</strong><br>Core‑Reflection</div>
+    <div class="module"><strong>Core.js</strong><br>Grundsignal‑Kern</div>
+    <div class="module"><strong>DSY.js</strong><br>Dynamische System‑Yield</div>
+    <div class="module"><strong>DO.js</strong><br>Direction‑Output</div>
+    <div class="module"><strong>EC.js</strong><br>Echo‑Cause</div>
+    <div class="module"><strong>ECHO.js</strong><br>Rückkehr‑Transformation</div>
+    <div class="module"><strong>HO.js</strong><br>Horizon‑Operator</div>
+    <div class="module"><strong>IT.js</strong><br>Identity‑Tick</div>
+    <div class="module"><strong>Dashboard.js</strong><br>Visualisierung</div>
+    <div class="module"><strong>PI.js</strong><br>Perfect Integration</div>
+
+    <button id="run-btn">System starten</button>
+  </div>
+
+  <!-- RIGHT SIDE: OUTPUT -->
+  <div id="right">
+    <h2>System‑Output</h2>
+    <div id="output">Bereit…</div>
+  </div>
+
+</div>
+
+<script type="module">
+import { CR } from "./CR.js";
+import { Core } from "./Core.js";
+import { DSY } from "./DSY.js";
+import { DO } from "./DO.js";
+import { EC } from "./EC.js";
+import { ID_ECHO } from "./ECHO.js";
+import { HO } from "./HO.js";
+import { IT } from "./IT.js";
+import { Dashboard } from "./Dashboard.js";
+import { PI } from "./PI.js";
+
+document.getElementById("run-btn").onclick = () => {
+
+  const pul = CR(1);
+  const ion = Core(2);
+  const mia = DO(3);
+
+  const echo = ID_ECHO(pul, ion, mia);
+  const dsy  = DSY(echo.value);
+  const ec   = EC(echo.value);
+  const ho   = HO(4);
+  const it   = IT(5);
 
   const state = {
     score: 0,
@@ -113,132 +151,29 @@ function restartGame(){
     superClicks: 0,
     jackpots: 0,
     metaVariance: 0,
-
     room: {
-      mid: cells[378],
-      pre: cells.slice(0, 378),
-      post: cells.slice(379),
-      teamActive: false,
-      axisState: "neutral"
+      pre: [],
+      mid: { style:{ background:"#000" }},
+      post: [],
+      teamActive:false,
+      axisState:"neutral"
     },
-
-    echo: null,
-    core: null,
-    dsy: null,
-    do: null,
-    ho: null,
-    it: null
-  };
-function restartGame(){
-
-  /* SCORE */
-  score = 0;
-  displayScore = 0;
-  document.getElementById("score").textContent = "Score: 0";
-
-  /* JACKPOT */
-  document.getElementById("jackpot-slot").textContent = "Jackpot: —";
-
-  /* GRID */
-  cells.forEach(c=>{
-    c.style.background = "#000";
-    c.style.transform = "none";
-    c.style.border = "1px solid #1f2937";
-  });
-
-  /* PANELS */
-  [...axisPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-  });
-
-  [...superPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-    btn.textContent = btn.textContent.split(":")[0];
-  });
-
-  /* MITTELSTATION */
-  MID_tick = 0;
-  MID_gate = "GA";
-  MID_room = MID_rooms.GA;
-
-  /* RAUM-MATRIX (756 → pre/mid/post) */
-  const room = {
-    pre: cells.slice(0, 378),
-    mid: cells[378],
-    post: cells.slice(379),
-    teamActive: false,
-    axisState: "neutral"
+    echo,
+    core: ion,
+    dsy,
+    do: mia,
+    ho,
+    it
   };
 
-  /* STATE für OPTA/QI/IQQ/PI */
-  const state = {
-    score: 0,
-    clicks: 0,
-    axisGood: 0,
-    axisBad: 0,
-    superHits: 0,
-    superClicks: 0,
-    jackpots: 0,
-    metaVariance: 0,
-
-    room,
-    echo: null,
-    core: null,
-    dsy: null,
-    do: null,
-    ho: null,
-    it: null
-  };
-
-  /* PI-System neu berechnen */
   const pi = PI(state);
 
-  console.log("PI-System:", pi);
+  Dashboard(pi);
 
-  /* FINAL-SCREEN */
-  document.getElementById("final-screen").style.display = "none";
+  document.getElementById("output").textContent =
+    JSON.stringify(pi, null, 2);
+};
+</script>
 
-  console.log("NEUSTART: System + PI vollständig zurückgesetzt.");
-}
-
-  const opta = OPTA(state);
-  const qi   = QI(state.room);
-  const iqq  = IQQ(opta, qi);
-  const pi   = PI(state);
-
-  console.log("OPTA:", opta);
-  console.log("QI:", qi);
-  console.log("IQQ:", iqq);
-  console.log("PI:", pi);
-
-
-  /* -----------------------------------------
-     6 · FINAL SCREEN
-  ----------------------------------------- */
-  document.getElementById("final-screen").style.display = "none";
-
-  console.log("NEUSTART: System + OPTA/QI/IQQ/PI vollständig zurückgesetzt.");
-}
-
-
-  // Axis-Panel zurücksetzen
-  [...axisPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-  });
-
-  // Super-Panel zurücksetzen
-  [...superPanel.children].forEach(btn=>{
-    btn.style.background = "#0b1220";
-    btn.textContent = btn.textContent.split(":")[0];
-  });
-
-  // Mittelstation zurücksetzen
-  MID_tick = 0;
-  MID_gate = "GA";
-  MID_room = MID_rooms.GA;
-
-  // Final-Screen schließen
-  document.getElementById("final-screen").style.display = "none";
-
-  console.log("NEUSTART: System vollständig zurückgesetzt.");
-}
+</body>
+</html>
