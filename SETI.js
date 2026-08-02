@@ -34,6 +34,15 @@ const SWITCHES = [
         desc: "H → B → T Rotation",
         run: () => { hbt.rotate(); link.sync(); return true; }
     },
+
+// SETI.js 
+import { SETIReality } from "./SETI-Reality.js";
+
+export function SETI(meta){
+    return SETIReality.evaluate(meta);
+}
+
+    
     {
         name: "ZEIT‑V",
         desc: "Vergangenheit – V‑Achse",
