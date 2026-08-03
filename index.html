@@ -138,19 +138,57 @@
 
 /* ============================
    SOUND ENGINE
+   Erzeugt Toene direkt im Browser - keine Dateien, keine Lizenzfrage.
+   Jeder Aufruf klingt leicht anders (Variation um eine Basisfrequenz),
+   genau wie bei echten Slot-Maschinen, wo der Sound nie 1:1 identisch ist.
    ============================ */
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-function playSound(freq = 440, duration = 0.15){
+
+function playSound(freq = 440, duration = 0.15, type = "sine"){
   const osc = audioCtx.createOscillator();
   const gain = audioCtx.createGain();
   osc.frequency.value = freq;
-  osc.type = "sine";
+  osc.type = type;
   gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
   gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
   osc.connect(gain);
   gain.connect(audioCtx.destination);
   osc.start();
   osc.stop(audioCtx.currentTime + duration);
+}
+
+// Hilfsfunktion: Basis-Ton + kleine Zufallsabweichung, damit es nie exakt gleich klingt
+function playVariant(baseFreq, spread, duration = 0.15, type = "sine"){
+  const freq = baseFreq + (Math.random() * spread * 2 - spread);
+  playSound(freq, duration, type);
+}
+
+// Klick-Sound (kurz, hell, jedes Mal leicht anders)
+function soundClick(){
+  playVariant(500, 60, 0.08, "sine");
+}
+
+// Achsen-Ergebnis: unterschiedlicher Klang je nach Qualitaet
+function soundAxis(quality){
+  if(quality === 0) playVariant(300, 20, 0.12, "sine");   // neutral
+  if(quality === 1) playVariant(700, 40, 0.15, "triangle"); // gut
+  if(quality === 2) playVariant(150, 20, 0.2, "sawtooth");  // schlecht
+}
+
+// Super-Button Ergebnis: pro Spiel-Typ ein eigener Grundton, leicht variiert
+function soundSuper(kind){
+  const map = {
+    chess: 600, skat: 550, rome: 650, jackpot: 850
+  };
+  playVariant(map[kind] || 500, 50, 0.2, "triangle");
+}
+
+// Jackpot: kleine aufsteigende Tonfolge, jedes Mal mit variierendem Startton
+function soundJackpotFanfare(hits){
+  const start = 500 + Math.random()*100;
+  for(let i=0; i<Math.min(hits, 6); i++){
+    setTimeout(()=> playSound(start + i*90, 0.12, "square"), i*90);
+  }
 }
 
 /* ============================
@@ -173,6 +211,7 @@ function checkEnd(){
    FINAL SCREEN
    ============================ */
 function FINAL(title, text){
+  STOP_AUTOFINALE();
   const FS = document.getElementById("final-screen");
   FS.innerHTML = `
     <div style="font-size:40px; margin-bottom:20px;">${title}</div>
@@ -231,11 +270,13 @@ for(let i=0;i<756;i++){
 
   cell.onclick = () => {
     const deg = Math.floor(Math.random()*360);
-    const col = "#" + Math.floor(Math.random()*16777215).toString(16);
+    // FIX: padStart sorgt fuer immer 6-stelligen Hex-Wert (keine kaputten Kurzfarben mehr)
+    const col = "#" + Math.floor(Math.random()*16777215).toString(16).padStart(6, "0");
     cell.style.transform = "rotate(" + deg + "deg) scale(1.2)";
     cell.style.background = col;
     cell.style.boxShadow = "0 0 12px " + col;
     setTimeout(()=>cell.style.transform="scale(1)",200);
+    soundClick();
     updateScore();
   };
 
@@ -256,6 +297,7 @@ for(let a=0; a<27; a++){
 
 function triggerAxis(axis, btn){
   const quality = Math.floor(Math.random()*3);
+  soundAxis(quality);
   if(quality === 0){ btn.style.background = "yellow"; axisMoveNeutral(axis); }
   if(quality === 1){ btn.style.background = "green"; axisMoveGood(axis); }
   if(quality === 2){ btn.style.background = "red"; axisMoveBad(axis); }
@@ -319,6 +361,7 @@ function superChess(i){
   const pieces = ["König","Dame","Turm","Springer","Läufer"];
   const piece = pieces[Math.floor(Math.random()*pieces.length)];
   superPanel.children[i].textContent = "Schach: " + piece;
+  soundSuper("chess");
   updateScore(4);
 }
 
@@ -326,6 +369,7 @@ function superSkat(i){
   const cards = ["♥","♦","♣","♠"];
   const card = cards[Math.floor(Math.random()*cards.length)];
   superPanel.children[i].textContent = "Skat: " + card;
+  soundSuper("skat");
   updateScore(3);
 }
 
@@ -334,6 +378,7 @@ function superRome(i){
   const col = ["red","blue","green"][Math.floor(Math.random()*3)];
   superPanel.children[i].style.background = col;
   superPanel.children[i].textContent = "Rommé: " + num;
+  soundSuper("rome");
   updateScore(2);
 }
 
@@ -347,6 +392,8 @@ function superJackpot(i){
     cells[cellIndex].style.background = "#ffaa00";
     cells[cellIndex].style.transform = "scale(1.2)";
   }
+  soundSuper("jackpot");
+  soundJackpotFanfare(hits);
   updateScore(hits * 5);
   document.getElementById("jackpot-slot").textContent = "Jackpot: " + sym;
   if(hits > 15){
@@ -356,10 +403,26 @@ function superJackpot(i){
 
 /* ============================
    AUTO-FINALE
+   FIX: als benannter, stoppbarer Timer statt anonymem setTimeout,
+   damit NEWGAME() ihn sauber zuruecksetzen kann.
    ============================ */
-setTimeout(()=>{
-  FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
-}, 13000);
+let autoFinaleTimer = null;
+
+function START_AUTOFINALE(){
+  STOP_AUTOFINALE();
+  autoFinaleTimer = setTimeout(()=>{
+    FINAL("ALLXALL · 360°", "Orbit abgeschlossen · System stabil.");
+  }, 13000);
+}
+
+function STOP_AUTOFINALE(){
+  if(autoFinaleTimer){
+    clearTimeout(autoFinaleTimer);
+    autoFinaleTimer = null;
+  }
+}
+
+START_AUTOFINALE();
 
 /* ============================
    PERFECT RESET ENGINE
@@ -427,6 +490,7 @@ function NEWGAME(){
   RESET_AXIS_PANEL();
   RESET_SUPER_PANEL();
   RESET_JACKPOT();
+  START_AUTOFINALE(); // FIX: Timer startet mit dem neuen Spiel neu, statt vom alten Laden der Seite zu stammen
 }
 
 document.getElementById("newgame-btn").onclick = NEWGAME;
