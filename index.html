@@ -121,6 +121,48 @@
     to { width:0%; }
   }
 
+  @keyframes lureBlink {
+    0%, 100% { box-shadow:0 0 4px #ffaa00; background:#0b1220; }
+    50% { box-shadow:0 0 20px 6px #ffaa00; background:#3a2a00; }
+  }
+
+  button.lure {
+    animation:lureBlink 0.5s ease-in-out infinite;
+    border-color:#ffaa00;
+  }
+
+  #lure-info {
+    position:fixed;
+    top:0; left:0; right:0; bottom:0;
+    background:rgba(0,0,0,0.85);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:200000;
+    padding:24px;
+  }
+
+  #lure-info .box {
+    max-width:420px;
+    background:#161b26;
+    border:2px solid #ffaa00;
+    border-radius:12px;
+    padding:24px;
+    text-align:center;
+    font-size:15px;
+    line-height:1.5;
+    color:#e2e8f0;
+  }
+
+  #lure-info .box h3 {
+    color:#ffaa00;
+    margin-top:0;
+  }
+
+  #lure-info button {
+    margin-top:16px;
+  }
+
   button {
     background:#0b1220;
     color:#7dd3fc;
@@ -149,17 +191,16 @@
 
   #newgame-btn {
     position:fixed;
-    bottom:140px;
-    left:50%;
-    transform:translateX(-50%);
+    top:8px;
+    right:12px;
     background:#0b1220;
     color:#7dd3fc;
     border:2px solid #7dd3fc;
-    padding:12px 20px;
+    padding:8px 16px;
     border-radius:8px;
-    font-size:18px;
+    font-size:15px;
     cursor:pointer;
-    z-index:99999;
+    z-index:100000;
   }
 </style>
 </head>
@@ -176,6 +217,15 @@
 <div id="jackpot-slot">Jackpot: —</div>
 <div id="grid"></div>
 <div id="final-screen"></div>
+
+<div id="lure-info">
+  <div class="box">
+    <h3>Aufgefallen? 👀</h3>
+    <p>Du hast auf den Button geklickt, der am hellsten geblinkt hat.</p>
+    <p>Genau mit diesem Trick – auffällige Blink-Reize – arbeiten echte Spielautomaten, damit man weiterspielt, statt nach dem Zufallsprinzip zu wählen.</p>
+    <button onclick="document.getElementById('lure-info').style.display='none'">Verstanden</button>
+  </div>
+</div>
 
 <button id="newgame-btn">ORBIT · Neues Spiel</button>
 
@@ -341,12 +391,19 @@ for(let a=0; a<27; a++){
 }
 
 function triggerAxis(axis, btn){
+  const wasLure = (btn === currentLureBtn);
   const quality = Math.floor(Math.random()*3);
   soundAxis(quality);
   if(quality === 0){ btn.style.background = "yellow"; axisMoveNeutral(axis); }
   if(quality === 1){ btn.style.background = "green"; axisMoveGood(axis); }
   if(quality === 2){ btn.style.background = "red"; axisMoveBad(axis); }
   registerCombo();
+
+  if(wasLure){
+    btn.classList.remove("lure");
+    currentLureBtn = null;
+    showLureInfo();
+  }
 }
 
 /* ============================
@@ -401,6 +458,54 @@ function triggerComboBonus(){
   comboLabel.textContent = `⚡ COMBO! +${bonus}`;
   comboLabel.style.color = "#22c55e";
   setTimeout(()=>{ comboLabel.style.color = "#ffaa00"; }, 800);
+}
+
+/* ============================
+   LURE-BUTTON (paedagogisch)
+   Alle paar Sekunden blinkt zufaellig EIN Achsen-Button besonders auffaellig.
+   Klickt der Spieler genau diesen, kommt eine ehrliche Aufklaerung darueber,
+   dass er auf den visuellen Reiz reagiert hat - kein Trick zum Weiterspielen,
+   sondern das Gegenteil: Sichtbarmachen des Mechanismus.
+   ============================ */
+let currentLureBtn = null;
+let lureIntervalTimer = null;
+
+function startLureCycle(){
+  stopLureCycle();
+  scheduleLure();
+}
+
+function scheduleLure(){
+  const delay = 4000 + Math.random()*4000; // alle 4-8 Sekunden ein neuer Koeder
+  lureIntervalTimer = setTimeout(()=>{
+    setLureButton();
+    scheduleLure();
+  }, delay);
+}
+
+function stopLureCycle(){
+  clearTimeout(lureIntervalTimer);
+  if(currentLureBtn) currentLureBtn.classList.remove("lure");
+  currentLureBtn = null;
+}
+
+function setLureButton(){
+  if(currentLureBtn) currentLureBtn.classList.remove("lure");
+  const idx = Math.floor(Math.random()*axisPanel.children.length);
+  currentLureBtn = axisPanel.children[idx];
+  currentLureBtn.classList.add("lure");
+
+  // Koeder blinkt max. 3 Sekunden, dann verschwindet er von selbst wieder (falls nicht geklickt)
+  setTimeout(()=>{
+    if(currentLureBtn){
+      currentLureBtn.classList.remove("lure");
+      currentLureBtn = null;
+    }
+  }, 3000);
+}
+
+function showLureInfo(){
+  document.getElementById("lure-info").style.display = "flex";
 }
 
 function axisMoveNeutral(axis){
@@ -523,6 +628,7 @@ function STOP_AUTOFINALE(){
 }
 
 START_AUTOFINALE();
+startLureCycle();
 
 /* ============================
    PERFECT RESET ENGINE
@@ -590,7 +696,9 @@ function NEWGAME(){
   RESET_AXIS_PANEL();
   RESET_SUPER_PANEL();
   RESET_JACKPOT();
+  resetCombo();
   START_AUTOFINALE(); // FIX: Timer startet mit dem neuen Spiel neu, statt vom alten Laden der Seite zu stammen
+  startLureCycle();
 }
 
 document.getElementById("newgame-btn").onclick = NEWGAME;
